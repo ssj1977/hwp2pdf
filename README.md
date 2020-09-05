@@ -19,13 +19,13 @@
 https://github.com/ssj1977/hwp2pdf/releases/download/Alpha/hwp2pdf.zip
 
 위 zip 파일의 내용물을 아무 경로에나 복사하면 작동합니다.
-설치된 폴더 내에는 아래와 같은 파일이 들어있어야 합니다.
+실행파일이 있는 폴더에는 아래와 같은 파일이 반드시 함께 들어있어야 합니다.
 
 - hwp2pdf.exe
 - AxInterop.HWPCONTROLLib.dll
 - Interop.HWPCONTROLLib.dll
 
-아래의 파일은 로컬 파일 접근권한 설정을 위해 필요한 파일입니다.
+아래의 파일은 로컬 파일 접근권한 설정을 위해 필요한 파일로, 실행파일과 같은 폴더에 두는 것을 권장합니다.
 
 - FilePathCheckerModuleExample.dll
 
