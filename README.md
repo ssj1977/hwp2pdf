@@ -6,20 +6,22 @@
 
 ## 요구사항
 
-한/글 2010 이상 버전이 PC에 설치되어 있어야 동작합니다.
-.NET Framework 3.5 버전이 필요합니다.
-Windows 10의 경우 기본 설치되어 있지만 혹시 설치되어 있지 않은 경우
-함께 제공되는 dotnetfx3.5.exe를 실행하여 설치해 주세요
+- 한/글 2010 이상 버전이 PC에 설치되어 있어야 동작합니다.
+- .NET Framework 3.5 버전이 필요합니다.
 
 ## 설치 방법
 
-아무 폴더에나 hwp2pdf.7z 파일의 압축을 풀면 바로 설치됩니다.
+빌드된 파일을 아무 경로에나 복사하면 작동합니다.
 설치된 폴더 내에는 아래와 같은 파일이 들어있어야 합니다.
 
 - hwp2pdf.exe
 - AxInterop.HWPCONTROLLib.dll
 - Interop.HWPCONTROLLib.dll
+
+아래의 파일은 HwpCtrl.OCX 의 파일 접근권한 설정을 위해 필요한 파일입니다.
 - FilePathCheckerModuleExample.dll
+아래 링크에서 구할 수 있습니다.
+https://www.hancom.com/board/devdataView.do?board_seq=47&artcl_seq=4085&pageInfo.page=&search_text=
 
 ## 사용 방법
 
