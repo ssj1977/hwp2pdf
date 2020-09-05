@@ -16,7 +16,9 @@
 
 ## 설치 방법
 
-빌드된 파일을 아무 경로에나 복사하면 작동합니다.
+https://github.com/ssj1977/hwp2pdf/releases/download/Alpha/hwp2pdf.zip
+
+위 zip 파일의 내용물을 아무 경로에나 복사하면 작동합니다.
 설치된 폴더 내에는 아래와 같은 파일이 들어있어야 합니다.
 
 - hwp2pdf.exe
@@ -24,12 +26,8 @@
 - Interop.HWPCONTROLLib.dll
 
 아래의 파일은 로컬 파일 접근권한 설정을 위해 필요한 파일입니다.
-해당 파일이 없는 경우 실행파일과 같은 경로에 복사해 주세요.
+
 - FilePathCheckerModuleExample.dll
-
-아래 링크에서 구할 수 있습니다.
-
-https://www.hancom.com/board/devdataView.do?board_seq=47&artcl_seq=4085&pageInfo.page=&search_text=
 
 ## 사용 방법
 
