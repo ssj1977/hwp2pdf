@@ -18,7 +18,7 @@
 - AxInterop.HWPCONTROLLib.dll
 - Interop.HWPCONTROLLib.dll
 
-아래의 파일은 HwpCtrl.OCX 의 파일 접근권한 설정을 위해 필요한 파일입니다.
+아래의 파일은 로컬 파일 접근권한 설정을 위해 필요한 파일입니다.
 해당 파일이 없는 경우 실행파일과 같은 경로에 복사해 주세요.
 - FilePathCheckerModuleExample.dll
 
