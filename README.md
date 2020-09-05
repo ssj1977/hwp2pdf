@@ -6,7 +6,7 @@
 
 ## 개발환경
 
-- Microsoft Visual Stuio Community 2019
+- Microsoft Visual Studio Community 2019
 - C# / Windows Forms Application
 
 ## 요구사항
