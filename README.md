@@ -4,6 +4,11 @@
 
 여러개의 HWP 파일을 PDF로 일괄 변환합니다.
 
+## 개발환경
+
+- Microsoft Visual Stuio Community 2019
+- C# / Windows Forms Application
+
 ## 요구사항
 
 - 한/글 2010 이상 버전이 PC에 설치되어 있어야 동작합니다.
