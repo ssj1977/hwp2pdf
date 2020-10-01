@@ -1,6 +1,6 @@
 ﻿namespace hwp2pdf
 {
-    partial class Form1
+    partial class FormMain
     {
         /// <summary>
         /// 필수 디자이너 변수입니다.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.col_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_path = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -42,6 +42,8 @@
             this.btn_close = new System.Windows.Forms.Button();
             this.text_title = new System.Windows.Forms.TextBox();
             this.axHwpCtrl1 = new AxHWPCONTROLLib.AxHwpCtrl();
+            this.btnSavePath = new System.Windows.Forms.Button();
+            this.textSavePath = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -84,11 +86,11 @@
             this.list_file.FullRowSelect = true;
             this.list_file.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.list_file.HideSelection = false;
-            this.list_file.Location = new System.Drawing.Point(12, 69);
+            this.list_file.Location = new System.Drawing.Point(12, 98);
             this.list_file.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.list_file.MinimumSize = new System.Drawing.Size(300, 200);
             this.list_file.Name = "list_file";
-            this.list_file.Size = new System.Drawing.Size(525, 288);
+            this.list_file.Size = new System.Drawing.Size(525, 259);
             this.list_file.SmallImageList = this.imageList_file;
             this.list_file.TabIndex = 1;
             this.list_file.UseCompatibleStateImageBehavior = false;
@@ -107,7 +109,7 @@
             // 
             this.btn_convert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_convert.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert.Location = new System.Drawing.Point(550, 69);
+            this.btn_convert.Location = new System.Drawing.Point(549, 100);
             this.btn_convert.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_convert.Name = "btn_convert";
             this.btn_convert.Size = new System.Drawing.Size(120, 50);
@@ -120,7 +122,7 @@
             // 
             this.btn_clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_clear.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_clear.Location = new System.Drawing.Point(550, 127);
+            this.btn_clear.Location = new System.Drawing.Point(549, 161);
             this.btn_clear.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_clear.Name = "btn_clear";
             this.btn_clear.Size = new System.Drawing.Size(120, 50);
@@ -172,40 +174,63 @@
             this.text_title.Size = new System.Drawing.Size(658, 50);
             this.text_title.TabIndex = 8;
             this.text_title.TabStop = false;
-            this.text_title.Text = "설치된 한/글을 활용하여 HWP 파일을 PDF 파일로 변환해서 같은 경로에 저장합니다.\r\n아래 목록에 HWP 파일을 끌어서 놓기로 추가한 후 \'변" +
-    "환\' 버튼을 클릭해 주세요.";
-            this.text_title.TextChanged += new System.EventHandler(this.text_title_TextChanged);
+            this.text_title.Text = "설치된 \'한글\'을 활용하여 HWP 파일을 PDF 파일로 변환합니다.\r\n아래 목록에 HWP 파일을 끌어서 놓기로 추가한 후 \'변환\' 버튼을 클릭해 " +
+    "주세요.";
             // 
             // axHwpCtrl1
             // 
-            this.axHwpCtrl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.axHwpCtrl1.Enabled = true;
-            this.axHwpCtrl1.Location = new System.Drawing.Point(550, 185);
-            this.axHwpCtrl1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.axHwpCtrl1.Location = new System.Drawing.Point(555, 228);
             this.axHwpCtrl1.Name = "axHwpCtrl1";
             this.axHwpCtrl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axHwpCtrl1.OcxState")));
-            this.axHwpCtrl1.Size = new System.Drawing.Size(122, 170);
-            this.axHwpCtrl1.TabIndex = 0;
+            this.axHwpCtrl1.Size = new System.Drawing.Size(114, 62);
+            this.axHwpCtrl1.TabIndex = 9;
             this.axHwpCtrl1.TabStop = false;
             this.axHwpCtrl1.Visible = false;
             // 
-            // Form1
+            // btnSavePath
+            // 
+            this.btnSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSavePath.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btnSavePath.Location = new System.Drawing.Point(549, 68);
+            this.btnSavePath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btnSavePath.Name = "btnSavePath";
+            this.btnSavePath.Size = new System.Drawing.Size(120, 24);
+            this.btnSavePath.TabIndex = 10;
+            this.btnSavePath.Text = "저장경로 변경...";
+            this.btnSavePath.UseVisualStyleBackColor = true;
+            this.btnSavePath.Click += new System.EventHandler(this.btnSavePath_Click);
+            // 
+            // textSavePath
+            // 
+            this.textSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textSavePath.Location = new System.Drawing.Point(12, 68);
+            this.textSavePath.Name = "textSavePath";
+            this.textSavePath.ReadOnly = true;
+            this.textSavePath.Size = new System.Drawing.Size(525, 23);
+            this.textSavePath.TabIndex = 12;
+            this.textSavePath.Text = "`";
+            // 
+            // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(684, 426);
+            this.Controls.Add(this.textSavePath);
+            this.Controls.Add(this.btnSavePath);
+            this.Controls.Add(this.axHwpCtrl1);
             this.Controls.Add(this.text_title);
             this.Controls.Add(this.btn_close);
             this.Controls.Add(this.text_log);
-            this.Controls.Add(this.axHwpCtrl1);
             this.Controls.Add(this.btn_clear);
             this.Controls.Add(this.btn_convert);
             this.Controls.Add(this.list_file);
             this.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
-            this.Name = "Form1";
+            this.Name = "FormMain";
             this.Text = "HWP -> PDF 변환기";
             ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).EndInit();
             this.ResumeLayout(false);
@@ -214,7 +239,6 @@
         }
 
         #endregion
-        private AxHWPCONTROLLib.AxHwpCtrl axHwpCtrl1;
         private System.Windows.Forms.ColumnHeader col_name;
         private System.Windows.Forms.ColumnHeader col_path;
         private System.Windows.Forms.ColumnHeader col_status;
@@ -226,6 +250,9 @@
         private System.Windows.Forms.TextBox text_log;
         private System.Windows.Forms.Button btn_close;
         private System.Windows.Forms.TextBox text_title;
+        private AxHWPCONTROLLib.AxHwpCtrl axHwpCtrl1;
+        private System.Windows.Forms.Button btnSavePath;
+        private System.Windows.Forms.TextBox textSavePath;
     }
 }
 

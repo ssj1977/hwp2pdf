@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace hwp2pdf
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
-        public Form1()
+        bool m_bUseCurrentPath = true;
+        string m_strSavePath = "";
+
+        public FormMain()
         {
             InitializeComponent();
             // FilePathCheckerModuleExample.DLL이 있어야 OCX컨트롤이 파일에 바로 접근 가능
@@ -17,7 +20,7 @@ namespace hwp2pdf
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
             if (reg == null)
             {
-                MessageBox.Show("한/글이 설치되어 있지 않습니다.");
+                MessageBox.Show("한글(2010 이상 버전)이 설치되어 있지 않습니다.");
                 return;
             }
             reg = reg.CreateSubKey("HwpCtrl");
@@ -80,7 +83,10 @@ namespace hwp2pdf
                 add_log("파일 접근권한 획득에 성공하였습니다.");
             else
                 add_log("파일 접근권한 획득에 실패했습니다. 경고창이 뜨면 [모두 허용]을 클릭하세요.");
-        }
+
+            m_strSavePath = System.IO.Directory.GetCurrentDirectory();
+            update_path();
+          }
 
         private void btn_convert_Click(object sender, EventArgs e)
         {
@@ -100,7 +106,11 @@ namespace hwp2pdf
                 {
                     list_file.Items[item.Index].SubItems[2].Text = "변환중";
                     list_file.RedrawItems(item.Index, item.Index, false);
-                    string pdf_path = System.IO.Path.GetDirectoryName(file_path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + ".PDF";
+                    string pdf_path = "";
+                    if (m_bUseCurrentPath == true)
+                        pdf_path = System.IO.Path.GetDirectoryName(file_path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + ".PDF";
+                    else
+                        pdf_path = m_strSavePath + "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + ".PDF";
                     if (axHwpCtrl1.SaveAs(pdf_path, "PDF", ""))
                     {
                         list_file.Items[item.Index].SubItems[2].Text = "완료";
@@ -112,8 +122,8 @@ namespace hwp2pdf
                 {
                     list_file.Items[item.Index].SubItems[2].Text = "열기실패";
                 }
-                list_file.RedrawItems(item.Index,item.Index, false);
-                 axHwpCtrl1.Clear();
+                list_file.RedrawItems(item.Index, item.Index, false);
+                axHwpCtrl1.Clear();
             }
             add_log(String.Format("{0}개 파일 중 {1}개 파일을 PDF로 변환하였습니다.", nTotal, nConverted));
             btn_convert.Enabled = true;
@@ -124,10 +134,19 @@ namespace hwp2pdf
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
-
+        private bool CheckDuplication(string filepath)
+        {
+            foreach (ListViewItem item in list_file.Items)
+            {
+                if (filepath.Equals(item.SubItems[3].Text, StringComparison.CurrentCultureIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
         private void list_file_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            Array.Sort(files);
             int nTotal = 0, nAdded = 0;
             foreach (string file in files)
             {
@@ -135,14 +154,17 @@ namespace hwp2pdf
                 string file_ext = System.IO.Path.GetExtension(file).ToUpper();
                 if (file_ext.Equals(".HWP") || file_ext.Equals(".TXT"))
                 {
-                    ListViewItem newItem = list_file.Items.Add(System.IO.Path.GetFileName(file), 0);
-                    newItem.SubItems.Add(System.IO.Path.GetDirectoryName(file));
-                    newItem.SubItems.Add("");
-                    newItem.SubItems.Add(System.IO.Path.GetFullPath(file));
-                    nAdded++;
+                    if (CheckDuplication(System.IO.Path.GetFullPath(file)) == false)
+                    {
+                        ListViewItem newItem = list_file.Items.Add(System.IO.Path.GetFileName(file), 0);
+                        newItem.SubItems.Add(System.IO.Path.GetDirectoryName(file));
+                        newItem.SubItems.Add("");
+                        newItem.SubItems.Add(System.IO.Path.GetFullPath(file));
+                        nAdded++;
+                    }
                 }
             }
-            add_log(String.Format("{0}개 파일 중 {1}개를 목록에 추가하였습니다.",nTotal, nAdded));
+            add_log(String.Format("{0}개 파일 중 {1}개를 목록에 추가하였습니다.", nTotal, nAdded));
         }
 
         private void list_file_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
@@ -170,10 +192,23 @@ namespace hwp2pdf
             String time_str = DateTime.Now.ToString("(HH:mm:ss) ");
             text_log.AppendText("\r\n" + time_str + text);
         }
-
-        private void text_title_TextChanged(object sender, EventArgs e)
+        private void btnSavePath_Click(object sender, EventArgs e)
         {
-
+            FormSetSavePath dlg = new FormSetSavePath();
+            dlg.setOption(m_bUseCurrentPath, m_strSavePath);
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                m_bUseCurrentPath = dlg.IsUseCurrentPath();
+                m_strSavePath = dlg.getSavePath();
+                update_path();
+            }
+            
+        }
+        private void update_path()
+        {
+            if (m_bUseCurrentPath == true)  textSavePath.Text = "변환된 파일을 원본 파일과 같은 폴더에 저장합니다.";
+            else textSavePath.Text = "PDF 저장 경로: "+ m_strSavePath;
+            textSavePath.Update();
         }
     }
 }
