@@ -3,6 +3,9 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Threading;
+using System.ComponentModel;
+using AxHWPCONTROLLib;
 
 namespace hwp2pdf
 {
@@ -10,7 +13,7 @@ namespace hwp2pdf
     {
         bool m_bUseCurrentPath = true;
         string m_strSavePath = "";
-
+        static bool st_bConverting = false;
         public FormMain()
         {
             InitializeComponent();
@@ -86,50 +89,127 @@ namespace hwp2pdf
 
             m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
-          }
-
-        private void btn_convert_Click(object sender, EventArgs e)
+        }
+        private delegate void add_log_delegate(string text);
+        private delegate void show_convert_state_delegate(int nRow, string text);
+        private delegate void enable_controls_delegate(bool bEnable);
+        private void add_log(string text)
         {
-            int nTotal = 0, nConverted = 0;
-            add_log("PDF 변환을 시작합니다. 잠시 기다려 주세요......");
-            btn_convert.Enabled = false;
-            btn_clear.Enabled = false;
+            if (text_log.InvokeRequired)
+            {
+                var d = new add_log_delegate(add_log);
+                Invoke(d, new object[] { text });
+            }
+            else
+            {
+                String time_str = DateTime.Now.ToString("(HH:mm:ss) ");
+                text_log.AppendText("\r\n" + time_str + text);
+            }
+        }
+        private void show_convert_state(int nRow, string text)
+        {
+            if (list_file.InvokeRequired)
+            {
+                var d = new show_convert_state_delegate(show_convert_state);
+                Invoke(d, new object[] { nRow, text });
+            }
+            else
+            {
+                list_file.Items[nRow].SubItems[2].Text = text;
+                list_file.RedrawItems(nRow, nRow, false);
+            }
+        }
+        private void enable_controls(bool bEnable)
+        {
+            if (list_file.InvokeRequired)
+            {
+                var d = new enable_controls_delegate(enable_controls);
+                Invoke(d, new object[] {bEnable});
+            }
+            else
+            {
+                list_file.Enabled = bEnable;
+                btnSavePath.Enabled = bEnable;
+                btn_clear.Enabled = bEnable;
+                btn_close.Enabled = bEnable;
+                btn_convert.Enabled = true;
+                if (bEnable)    btn_convert.Text = "변환";
+                else            btn_convert.Text = "변환 중단";
+            }
+        }
+        private void convert_files()
+        {
+            if (st_bConverting == true)
+            {
+                st_bConverting = false;
+                btn_convert.Enabled = false;
+                return;
+            }
+            if (list_file.Items.Count <= 0) return;
+            String[] paths = new string[list_file.Items.Count];
+            int nIndex = 0;
             foreach (ListViewItem item in list_file.Items)
             {
-                nTotal++;
-                string file_path = item.SubItems[3].Text;
+                paths[nIndex] = item.SubItems[3].Text;
+                item.SubItems[2].Text = "";
+                nIndex++;
+            }
+            Thread th = new Thread(() => convert_thread(paths, m_bUseCurrentPath, m_strSavePath));
+            th.SetApartmentState(ApartmentState.STA);
+            st_bConverting = true;
+            enable_controls(false);
+            th.Start();
+        }
+        private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
+        {
+            AxHwpCtrl temp_hwp = new AxHwpCtrl();
+            temp_hwp.CreateControl();
+            bool bReg = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
+            int nRow =0 ;
+            int nConverted = 0;
+            add_log("PDF 변환을 시작합니다. 잠시 기다려 주세요......");
+            foreach (string file_path in paths)
+            {
                 string file_ext = System.IO.Path.GetExtension(file_path).ToUpper();
                 string file_type = "";
                 if (file_ext.Equals(".HWP")) file_type = "HWP";
                 else if (file_ext.Equals(".TXT")) file_type = "UNICODE";
-                if (axHwpCtrl1.Open(file_path, file_type, ""))
+                if (temp_hwp.Open(file_path, file_type, ""))
                 {
-                    list_file.Items[item.Index].SubItems[2].Text = "변환중";
-                    list_file.RedrawItems(item.Index, item.Index, false);
+                    show_convert_state(nRow, "변환중");
                     string pdf_path = "";
-                    if (m_bUseCurrentPath == true)
+                    if (bUseCurrentPath == true)
                         pdf_path = System.IO.Path.GetDirectoryName(file_path) + "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + ".PDF";
                     else
-                        pdf_path = m_strSavePath + "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + ".PDF";
-                    if (axHwpCtrl1.SaveAs(pdf_path, "PDF", ""))
+                        pdf_path = strSavePath + "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + ".PDF";
+                    if (temp_hwp.SaveAs(pdf_path, "PDF", ""))
                     {
-                        list_file.Items[item.Index].SubItems[2].Text = "완료";
+                        show_convert_state(nRow, "완료");
                         nConverted++;
                     }
-                    else list_file.Items[item.Index].SubItems[2].Text = "변환실패";
+                    else show_convert_state(nRow, "열기실패");
                 }
-                else
+                else show_convert_state(nRow, "변환실패");
+                temp_hwp.Clear();
+                nRow++;
+                if (st_bConverting == false)
                 {
-                    list_file.Items[item.Index].SubItems[2].Text = "열기실패";
+                    add_log("변환 작업을 중단합니다.");
+                    break;
                 }
-                list_file.RedrawItems(item.Index, item.Index, false);
-                axHwpCtrl1.Clear();
             }
-            add_log(String.Format("{0}개 파일 중 {1}개 파일을 PDF로 변환하였습니다.", nTotal, nConverted));
-            btn_convert.Enabled = true;
-            btn_clear.Enabled = true;
+            add_log(String.Format("{0}개 파일 중 {1}개 파일을 PDF로 변환하였습니다.", paths.Length, nConverted));
+            st_bConverting = false;
+            enable_controls(true);
         }
-
+        private void btn_convert_Click(object sender, EventArgs e)
+        {
+            convert_files();
+        }
+        private void list_menu_convert_Click(object sender, EventArgs e)
+        {
+            convert_files();
+        }
         private void list_file_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
@@ -147,6 +227,10 @@ namespace hwp2pdf
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             Array.Sort(files);
+            add_files(files);
+        }
+        private void add_files(string[] files)
+        {
             int nTotal = 0, nAdded = 0;
             foreach (string file in files)
             {
@@ -166,14 +250,12 @@ namespace hwp2pdf
             }
             add_log(String.Format("{0}개 파일 중 {1}개를 목록에 추가하였습니다.", nTotal, nAdded));
         }
-
         private void list_file_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
         {
             e.Graphics.FillRectangle(Brushes.LightGray, e.Bounds);
             e.DrawText();
         }
-
-        private void btn_clear_Click(object sender, EventArgs e)
+        private void clear_files()
         {
             if (list_file.Items.Count > 0)
             {
@@ -181,16 +263,21 @@ namespace hwp2pdf
                 add_log("목록을 초기화하였습니다.");
             }
         }
-
+        private void list_menu_clear_Click(object sender, EventArgs e)
+        {
+            clear_files();
+        }
+        private void btn_clear_Click(object sender, EventArgs e)
+        {
+            clear_files();
+        }
         private void btn_close_Click(object sender, EventArgs e)
         {
             Close();
         }
-
-        private void add_log(String text)
+        private void list_menu_exit_Click(object sender, EventArgs e)
         {
-            String time_str = DateTime.Now.ToString("(HH:mm:ss) ");
-            text_log.AppendText("\r\n" + time_str + text);
+            Close();
         }
         private void btnSavePath_Click(object sender, EventArgs e)
         {
@@ -209,6 +296,38 @@ namespace hwp2pdf
             if (m_bUseCurrentPath == true)  textSavePath.Text = "변환된 파일을 원본 파일과 같은 폴더에 저장합니다.";
             else textSavePath.Text = "PDF 저장 경로: "+ m_strSavePath;
             textSavePath.Update();
+        }
+        private void FormMain_KeyUp(object sender, KeyEventArgs e)
+        {
+            /*switch (e.KeyCode)
+            {
+            }*/
+        }
+        private void list_menu_add_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "HWP 파일(*.hwp)|*.hwp|All File(*.*)|*.*";
+            dlg.Multiselect = true;
+            dlg.Title = "추가할 HWP 파일을 선택해 주세요";
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                string[] files = dlg.FileNames;
+                Array.Sort(files);
+                add_files(files);
+            }
+        }
+        private void list_menu_delete_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in list_file.SelectedItems)
+            {
+                list_file.Items.Remove(item);
+            }
+        }
+        private void contextMenu_list_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            contextMenu_list.Items[1].Enabled = (list_file.SelectedItems.Count > 0);
+            contextMenu_list.Items[2].Enabled = (list_file.Items.Count > 0);
+            contextMenu_list.Items[4].Enabled = (list_file.Items.Count > 0);
         }
     }
 }

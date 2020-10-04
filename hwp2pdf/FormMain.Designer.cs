@@ -35,6 +35,13 @@
             this.col_status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_fullpath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.list_file = new System.Windows.Forms.ListView();
+            this.contextMenu_list = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.list_menu_add = new System.Windows.Forms.ToolStripMenuItem();
+            this.list_menu_delete = new System.Windows.Forms.ToolStripMenuItem();
+            this.list_menu_clear = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.list_menu_convert = new System.Windows.Forms.ToolStripMenuItem();
+            this.list_menu_exit = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList_file = new System.Windows.Forms.ImageList(this.components);
             this.btn_convert = new System.Windows.Forms.Button();
             this.btn_clear = new System.Windows.Forms.Button();
@@ -44,6 +51,7 @@
             this.axHwpCtrl1 = new AxHWPCONTROLLib.AxHwpCtrl();
             this.btnSavePath = new System.Windows.Forms.Button();
             this.textSavePath = new System.Windows.Forms.TextBox();
+            this.contextMenu_list.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -82,6 +90,7 @@
             this.col_path,
             this.col_status,
             this.col_fullpath});
+            this.list_file.ContextMenuStrip = this.contextMenu_list;
             this.list_file.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.list_file.FullRowSelect = true;
             this.list_file.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -98,6 +107,64 @@
             this.list_file.DrawColumnHeader += new System.Windows.Forms.DrawListViewColumnHeaderEventHandler(this.list_file_DrawColumnHeader);
             this.list_file.DragDrop += new System.Windows.Forms.DragEventHandler(this.list_file_DragDrop);
             this.list_file.DragEnter += new System.Windows.Forms.DragEventHandler(this.list_file_DragEnter);
+            // 
+            // contextMenu_list
+            // 
+            this.contextMenu_list.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.list_menu_add,
+            this.list_menu_delete,
+            this.list_menu_clear,
+            this.toolStripSeparator1,
+            this.list_menu_convert,
+            this.list_menu_exit});
+            this.contextMenu_list.Name = "contextMenu_list";
+            this.contextMenu_list.Size = new System.Drawing.Size(197, 142);
+            this.contextMenu_list.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_list_Opening);
+            // 
+            // list_menu_add
+            // 
+            this.list_menu_add.Name = "list_menu_add";
+            this.list_menu_add.ShortcutKeys = System.Windows.Forms.Keys.Insert;
+            this.list_menu_add.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_add.Text = "항목 추가하기...";
+            this.list_menu_add.Click += new System.EventHandler(this.list_menu_add_Click);
+            // 
+            // list_menu_delete
+            // 
+            this.list_menu_delete.Name = "list_menu_delete";
+            this.list_menu_delete.ShortcutKeys = System.Windows.Forms.Keys.Delete;
+            this.list_menu_delete.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_delete.Text = "항목 지우기";
+            this.list_menu_delete.Click += new System.EventHandler(this.list_menu_delete_Click);
+            // 
+            // list_menu_clear
+            // 
+            this.list_menu_clear.Name = "list_menu_clear";
+            this.list_menu_clear.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.Delete)));
+            this.list_menu_clear.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_clear.Text = "목록 초기화";
+            this.list_menu_clear.Click += new System.EventHandler(this.list_menu_clear_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
+            // 
+            // list_menu_convert
+            // 
+            this.list_menu_convert.Name = "list_menu_convert";
+            this.list_menu_convert.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.list_menu_convert.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_convert.Text = "변환 시작";
+            this.list_menu_convert.Click += new System.EventHandler(this.list_menu_convert_Click);
+            // 
+            // list_menu_exit
+            // 
+            this.list_menu_exit.Name = "list_menu_exit";
+            this.list_menu_exit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
+            this.list_menu_exit.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_exit.Text = "종료";
+            this.list_menu_exit.Click += new System.EventHandler(this.list_menu_exit_Click);
             // 
             // imageList_file
             // 
@@ -149,6 +216,7 @@
             // btn_close
             // 
             this.btn_close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_close.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btn_close.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btn_close.Location = new System.Drawing.Point(550, 363);
             this.btn_close.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -211,12 +279,12 @@
             this.textSavePath.ReadOnly = true;
             this.textSavePath.Size = new System.Drawing.Size(525, 23);
             this.textSavePath.TabIndex = 12;
-            this.textSavePath.Text = "`";
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.btn_close;
             this.ClientSize = new System.Drawing.Size(684, 426);
             this.Controls.Add(this.textSavePath);
             this.Controls.Add(this.btnSavePath);
@@ -228,10 +296,13 @@
             this.Controls.Add(this.btn_convert);
             this.Controls.Add(this.list_file);
             this.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.KeyPreview = true;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
             this.Text = "HWP -> PDF 변환기";
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
+            this.contextMenu_list.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -253,6 +324,13 @@
         private AxHWPCONTROLLib.AxHwpCtrl axHwpCtrl1;
         private System.Windows.Forms.Button btnSavePath;
         private System.Windows.Forms.TextBox textSavePath;
+        private System.Windows.Forms.ContextMenuStrip contextMenu_list;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_add;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_delete;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_clear;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_convert;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_exit;
     }
 }
 
