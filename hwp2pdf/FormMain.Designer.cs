@@ -118,7 +118,7 @@
             this.list_menu_convert,
             this.list_menu_exit});
             this.contextMenu_list.Name = "contextMenu_list";
-            this.contextMenu_list.Size = new System.Drawing.Size(197, 142);
+            this.contextMenu_list.Size = new System.Drawing.Size(197, 120);
             this.contextMenu_list.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_list_Opening);
             // 
             // list_menu_add

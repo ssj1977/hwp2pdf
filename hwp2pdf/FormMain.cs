@@ -4,8 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
-using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using AxHWPCONTROLLib;
+
 
 namespace hwp2pdf
 {
@@ -226,7 +228,7 @@ namespace hwp2pdf
         private void list_file_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            Array.Sort(files);
+            Array.Sort(files, new FileNameComparer());
             add_files(files);
         }
         private void add_files(string[] files)
@@ -312,7 +314,7 @@ namespace hwp2pdf
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 string[] files = dlg.FileNames;
-                Array.Sort(files);
+                Array.Sort(files, new FileNameComparer());
                 add_files(files);
             }
         }
@@ -330,4 +332,17 @@ namespace hwp2pdf
             contextMenu_list.Items[4].Enabled = (list_file.Items.Count > 0);
         }
     }
+}
+
+public class FileNameComparer : IComparer<string>
+{
+
+    [DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+    static extern int StrCmpLogicalW(String x, String y);
+
+    public int Compare(string x, string y)
+    {
+        return StrCmpLogicalW(x, y);
+    }
+
 }
