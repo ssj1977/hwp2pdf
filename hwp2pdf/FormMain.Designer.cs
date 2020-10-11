@@ -301,6 +301,7 @@
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
             this.Text = "HWP -> PDF 변환기";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).EndInit();

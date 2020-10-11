@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using System.Threading;
+using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using AxHWPCONTROLLib;
@@ -19,6 +20,13 @@ namespace hwp2pdf
         public FormMain()
         {
             InitializeComponent();
+            //ini 파일에서 정보 불러오기
+            String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
+            StringBuilder strTemp = new StringBuilder();
+            GetPrivateProfileString("Main", "SavePath", "", strTemp, strTemp.Capacity, ini_path);
+            m_strSavePath = strTemp.ToString();
+            GetPrivateProfileString("Main", "SaveToCurrentPath", "", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) m_bUseCurrentPath = bool.Parse(strTemp.ToString());
             // FilePathCheckerModuleExample.DLL이 있어야 OCX컨트롤이 파일에 바로 접근 가능
             // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpCtrl\Modules"에 
             // FilePathCheckerModuleExample 값으로 DLL의 위치가 등록되어 있어야 함
@@ -89,7 +97,7 @@ namespace hwp2pdf
             else
                 add_log("파일 접근권한 획득에 실패했습니다. 경고창이 뜨면 [모두 허용]을 클릭하세요.");
 
-            m_strSavePath = System.IO.Directory.GetCurrentDirectory();
+            if (m_bUseCurrentPath == true) m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
         }
         private delegate void add_log_delegate(string text);
@@ -281,6 +289,13 @@ namespace hwp2pdf
         {
             Close();
         }
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
+            WritePrivateProfileString("Main", "SaveToCurrentPath", m_bUseCurrentPath.ToString(), ini_path);
+            if (m_bUseCurrentPath == true) m_strSavePath = "";
+            WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
+        }
         private void btnSavePath_Click(object sender, EventArgs e)
         {
             FormSetSavePath dlg = new FormSetSavePath();
@@ -331,6 +346,11 @@ namespace hwp2pdf
             contextMenu_list.Items[2].Enabled = (list_file.Items.Count > 0);
             contextMenu_list.Items[4].Enabled = (list_file.Items.Count > 0);
         }
+
+        [DllImport("kernel32")]
+        private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
+        [DllImport("kernel32")]
+        private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
     }
 }
 
