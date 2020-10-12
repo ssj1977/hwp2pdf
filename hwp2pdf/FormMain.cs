@@ -22,7 +22,7 @@ namespace hwp2pdf
             InitializeComponent();
             //ini 파일에서 정보 불러오기
             String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
-            StringBuilder strTemp = new StringBuilder();
+            StringBuilder strTemp = new StringBuilder(1024, 1024);
             GetPrivateProfileString("Main", "SavePath", "", strTemp, strTemp.Capacity, ini_path);
             m_strSavePath = strTemp.ToString();
             GetPrivateProfileString("Main", "SaveToCurrentPath", "", strTemp, strTemp.Capacity, ini_path);
