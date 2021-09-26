@@ -126,6 +126,7 @@
             this.Controls.Add(this.radioSpecificPath);
             this.Controls.Add(this.radioCurrentPath);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormSetSavePath";
             this.Text = "변환한 파일을 저장할 경로를 설정합니다.";

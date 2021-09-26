@@ -147,8 +147,11 @@ namespace hwp2pdf
                 btn_clear.Enabled = bEnable;
                 btn_close.Enabled = bEnable;
                 btn_convert_pdf.Enabled = true;
-                if (bEnable)    btn_convert_pdf.Text = "변환";
+                btn_convert_hwpx.Enabled = true;
+                if (bEnable)    btn_convert_pdf.Text = "PDF로 변환";
                 else            btn_convert_pdf.Text = "변환 중단";
+                if (bEnable)    btn_convert_hwpx.Text = "HWPX로 변환";
+                else            btn_convert_hwpx.Text = "변환 중단";
             }
         }
         private void convert_files()
@@ -157,6 +160,7 @@ namespace hwp2pdf
             {
                 st_bConverting = false;
                 btn_convert_pdf.Enabled = false;
+                btn_convert_hwpx.Enabled = false;
                 return;
             }
             if (list_file.Items.Count <= 0) return;
