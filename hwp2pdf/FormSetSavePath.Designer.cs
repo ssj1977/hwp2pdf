@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSetSavePath));
             this.radioCurrentPath = new System.Windows.Forms.RadioButton();
             this.radioSpecificPath = new System.Windows.Forms.RadioButton();
             this.textSavePath = new System.Windows.Forms.TextBox();
@@ -69,7 +70,7 @@
             this.textSavePath.Location = new System.Drawing.Point(12, 88);
             this.textSavePath.Name = "textSavePath";
             this.textSavePath.Size = new System.Drawing.Size(452, 29);
-            this.textSavePath.TabIndex = 2;
+            this.textSavePath.TabIndex = 3;
             // 
             // btnSavePath
             // 
@@ -77,7 +78,7 @@
             this.btnSavePath.Location = new System.Drawing.Point(334, 53);
             this.btnSavePath.Name = "btnSavePath";
             this.btnSavePath.Size = new System.Drawing.Size(130, 29);
-            this.btnSavePath.TabIndex = 3;
+            this.btnSavePath.TabIndex = 2;
             this.btnSavePath.Text = "폴더 찾기...";
             this.btnSavePath.UseVisualStyleBackColor = true;
             this.btnSavePath.Click += new System.EventHandler(this.btnSavePath_Click);
@@ -125,6 +126,7 @@
             this.Controls.Add(this.radioSpecificPath);
             this.Controls.Add(this.radioCurrentPath);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormSetSavePath";
             this.Text = "변환한 파일을 저장할 경로를 설정합니다.";
             this.Load += new System.EventHandler(this.FormSetSavePath_Load);
