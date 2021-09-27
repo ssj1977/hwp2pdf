@@ -31,9 +31,9 @@ namespace hwp2pdf
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormConfig));
             this.groupBox_overwrite_option = new System.Windows.Forms.GroupBox();
-            this.radioButton_newname = new System.Windows.Forms.RadioButton();
-            this.radioButton_skip = new System.Windows.Forms.RadioButton();
             this.radioButton_overwrite = new System.Windows.Forms.RadioButton();
+            this.radioButton_skip = new System.Windows.Forms.RadioButton();
+            this.radioButton_newname = new System.Windows.Forms.RadioButton();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.groupBox_overwrite_option.SuspendLayout();
@@ -52,17 +52,17 @@ namespace hwp2pdf
             this.groupBox_overwrite_option.TabStop = false;
             this.groupBox_overwrite_option.Text = "변환할 파일과 같은 이름의 파일이 있을때 처리 방법";
             // 
-            // radioButton_newname
+            // radioButton_overwrite
             // 
-            this.radioButton_newname.AutoSize = true;
-            this.radioButton_newname.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.radioButton_newname.Location = new System.Drawing.Point(18, 42);
-            this.radioButton_newname.Name = "radioButton_newname";
-            this.radioButton_newname.Size = new System.Drawing.Size(356, 25);
-            this.radioButton_newname.TabIndex = 0;
-            this.radioButton_newname.TabStop = true;
-            this.radioButton_newname.Text = "이름 뒤에 번호를 붙여서 새 파일을 만듭니다.";
-            this.radioButton_newname.UseVisualStyleBackColor = true;
+            this.radioButton_overwrite.AutoSize = true;
+            this.radioButton_overwrite.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.radioButton_overwrite.Location = new System.Drawing.Point(18, 104);
+            this.radioButton_overwrite.Name = "radioButton_overwrite";
+            this.radioButton_overwrite.Size = new System.Drawing.Size(204, 25);
+            this.radioButton_overwrite.TabIndex = 2;
+            this.radioButton_overwrite.TabStop = true;
+            this.radioButton_overwrite.Text = "기존 파일에 덮어씁니다.";
+            this.radioButton_overwrite.UseVisualStyleBackColor = true;
             // 
             // radioButton_skip
             // 
@@ -76,24 +76,24 @@ namespace hwp2pdf
             this.radioButton_skip.Text = "해당 파일을 변환하지 않습니다.";
             this.radioButton_skip.UseVisualStyleBackColor = true;
             // 
-            // radioButton_overwrite
+            // radioButton_newname
             // 
-            this.radioButton_overwrite.AutoSize = true;
-            this.radioButton_overwrite.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.radioButton_overwrite.Location = new System.Drawing.Point(18, 104);
-            this.radioButton_overwrite.Name = "radioButton_overwrite";
-            this.radioButton_overwrite.Size = new System.Drawing.Size(204, 25);
-            this.radioButton_overwrite.TabIndex = 2;
-            this.radioButton_overwrite.TabStop = true;
-            this.radioButton_overwrite.Text = "기존 파일에 덮어씁니다.";
-            this.radioButton_overwrite.UseVisualStyleBackColor = true;
+            this.radioButton_newname.AutoSize = true;
+            this.radioButton_newname.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.radioButton_newname.Location = new System.Drawing.Point(18, 42);
+            this.radioButton_newname.Name = "radioButton_newname";
+            this.radioButton_newname.Size = new System.Drawing.Size(356, 25);
+            this.radioButton_newname.TabIndex = 0;
+            this.radioButton_newname.TabStop = true;
+            this.radioButton_newname.Text = "이름 뒤에 번호를 붙여서 새 파일을 만듭니다.";
+            this.radioButton_newname.UseVisualStyleBackColor = true;
             // 
             // btnCancel
             // 
             this.btnCancel.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnCancel.Location = new System.Drawing.Point(421, 181);
+            this.btnCancel.Location = new System.Drawing.Point(437, 179);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(126, 48);
+            this.btnCancel.Size = new System.Drawing.Size(110, 42);
             this.btnCancel.TabIndex = 7;
             this.btnCancel.Text = "취소";
             this.btnCancel.UseVisualStyleBackColor = true;
@@ -102,9 +102,9 @@ namespace hwp2pdf
             // btnOk
             // 
             this.btnOk.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnOk.Location = new System.Drawing.Point(285, 181);
+            this.btnOk.Location = new System.Drawing.Point(318, 179);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(126, 48);
+            this.btnOk.Size = new System.Drawing.Size(110, 42);
             this.btnOk.TabIndex = 6;
             this.btnOk.Text = "확인";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -114,7 +114,8 @@ namespace hwp2pdf
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(559, 241);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(559, 235);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.groupBox_overwrite_option);
@@ -125,6 +126,7 @@ namespace hwp2pdf
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormConfig";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "설정";
             this.Load += new System.EventHandler(this.FormConfig_Load);
             this.groupBox_overwrite_option.ResumeLayout(false);

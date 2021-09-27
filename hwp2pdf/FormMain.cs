@@ -31,13 +31,41 @@ namespace hwp2pdf
             if (strTemp.Length > 0) m_bUseCurrentPath = bool.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "OptionOverwrite", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0) option_overwrite = int.Parse(strTemp.ToString());
+            GetPrivateProfileString("Main", "Bounds", "", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0)
+            {
+                String strLocation = strTemp.ToString();
+                String[] strTokens = strLocation.Split(',');
+                int count = 0, 
+                    x = this.Location.X, y= this.Location.Y, 
+                    w = this.Size.Width, h = this.Size.Height;
+                foreach(String strToken in strTokens)
+                {
+                    if (count == 0) x = int.Parse(strToken);
+                    else if (count == 1) y = int.Parse(strToken);
+                    else if (count == 2) w = int.Parse(strToken);
+                    else if (count == 3) h = int.Parse(strToken);
+                    else break;
+                    count++;
+                }
+                Rectangle temp_rect = Rectangle.FromLTRB(x, y, x+w-1, y+h-1);
+                if (SystemInformation.VirtualScreen.IntersectsWith(temp_rect) == true)
+                {
+                    this.SetDesktopBounds(x, y, w, h);
+                }
+                else
+                {
+                    int xzz = 1;
+                }
+            }
+
             // FilePathCheckerModuleExample.DLL이 있어야 OCX컨트롤이 파일에 바로 접근 가능
             // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpCtrl\Modules"에 
             // FilePathCheckerModuleExample 값으로 DLL의 위치가 등록되어 있어야 함
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
             if (reg == null)
             {
-                MessageBox.Show("한글(2010 이상 버전)이 설치되어 있지 않습니다.");
+                MessageBox.Show("한/글(2010 이상 버전)이 설치되어 있지 않습니다.");
                 return;
             }
             reg = reg.CreateSubKey("HwpCtrl");
@@ -185,7 +213,7 @@ namespace hwp2pdf
             bool bReg = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
             int nRow =0 ;
             int nConverted = 0;
-            add_log("PDF 변환을 시작합니다. 잠시 기다려 주세요......");
+            add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
             foreach (string file_path in paths)
             {
                 string file_ext = System.IO.Path.GetExtension(file_path).ToUpper();
@@ -253,10 +281,10 @@ namespace hwp2pdf
                             else show_convert_state(nRow, "완료");
                             nConverted++;
                         }
-                        else show_convert_state(nRow, "열기실패");
+                        else show_convert_state(nRow, "변환 시도 실패");
                     }
                 }
-                else show_convert_state(nRow, "변환실패");
+                else show_convert_state(nRow, "원본파일 열기 실패");
                 temp_hwp.Clear();
                 nRow++;
                 if (st_bConverting == false)
@@ -265,7 +293,7 @@ namespace hwp2pdf
                     break;
                 }
             }
-            add_log(String.Format("{0}개 파일 중 {1}개 파일을 PDF로 변환하였습니다.", paths.Length, nConverted));
+            add_log(String.Format("{0}개 파일 중 {1}개 파일을 변환하였습니다.", paths.Length, nConverted));
             st_bConverting = false;
             enable_controls(true);
         }
@@ -371,12 +399,24 @@ namespace hwp2pdf
             if (m_bUseCurrentPath == true) m_strSavePath = "";
             WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
             WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path);
+            String strTemp;
+            if (WindowState == FormWindowState.Maximized || WindowState==FormWindowState.Minimized)
+            {
+                strTemp = RestoreBounds.Location.X.ToString() + ',' + RestoreBounds.Location.Y.ToString()
+                    + ',' + RestoreBounds.Size.Width.ToString() + ',' + RestoreBounds.Size.Height.ToString();
+            }
+            else
+            {
+                strTemp = this.Location.X.ToString() + ',' + this.Location.Y.ToString()
+                    + ',' + this.Size.Width.ToString() + ',' + this.Size.Height.ToString();
+            }
+            WritePrivateProfileString("Main", "Bounds", strTemp, ini_path);
         }
         private void btnSavePath_Click(object sender, EventArgs e)
         {
             FormSetSavePath dlg = new FormSetSavePath();
             dlg.setOption(m_bUseCurrentPath, m_strSavePath);
-            if (dlg.ShowDialog() == DialogResult.OK)
+             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 m_bUseCurrentPath = dlg.IsUseCurrentPath();
                 m_strSavePath = dlg.getSavePath();
@@ -387,7 +427,7 @@ namespace hwp2pdf
         private void update_path()
         {
             if (m_bUseCurrentPath == true)  textSavePath.Text = "변환된 파일을 원본 파일과 같은 폴더에 저장합니다.";
-            else textSavePath.Text = "PDF 저장 경로: "+ m_strSavePath;
+            else textSavePath.Text = "변환된 파일 저장 경로: "+ m_strSavePath;
             textSavePath.Update();
         }
         private void FormMain_KeyUp(object sender, KeyEventArgs e)

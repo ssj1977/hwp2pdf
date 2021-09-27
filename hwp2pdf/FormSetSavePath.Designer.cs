@@ -35,7 +35,6 @@
             this.btnSavePath = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // radioCurrentPath
@@ -85,10 +84,11 @@
             // 
             // btnOk
             // 
+            this.btnOk.AutoSize = true;
             this.btnOk.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnOk.Location = new System.Drawing.Point(198, 145);
+            this.btnOk.Location = new System.Drawing.Point(217, 136);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(126, 48);
+            this.btnOk.Size = new System.Drawing.Size(111, 40);
             this.btnOk.TabIndex = 4;
             this.btnOk.Text = "확인";
             this.btnOk.UseVisualStyleBackColor = true;
@@ -97,38 +97,32 @@
             // btnCancel
             // 
             this.btnCancel.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnCancel.Location = new System.Drawing.Point(334, 145);
+            this.btnCancel.Location = new System.Drawing.Point(353, 136);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(126, 48);
+            this.btnCancel.Size = new System.Drawing.Size(111, 40);
             this.btnCancel.TabIndex = 5;
             this.btnCancel.Text = "취소";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
-            // label1
-            // 
-            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label1.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label1.Location = new System.Drawing.Point(-3, 131);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(486, 80);
-            this.label1.TabIndex = 6;
-            // 
             // FormSetSavePath
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(475, 206);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(477, 191);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.btnSavePath);
             this.Controls.Add(this.textSavePath);
             this.Controls.Add(this.radioSpecificPath);
             this.Controls.Add(this.radioCurrentPath);
-            this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormSetSavePath";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "변환한 파일을 저장할 경로를 설정합니다.";
             this.Load += new System.EventHandler(this.FormSetSavePath_Load);
             this.ResumeLayout(false);
@@ -144,6 +138,5 @@
         private System.Windows.Forms.Button btnSavePath;
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnCancel;
-        private System.Windows.Forms.Label label1;
     }
 }

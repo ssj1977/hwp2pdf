@@ -160,7 +160,7 @@
             this.list_menu_convert_pdf.Name = "list_menu_convert_pdf";
             this.list_menu_convert_pdf.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
             this.list_menu_convert_pdf.Size = new System.Drawing.Size(196, 22);
-            this.list_menu_convert_pdf.Text = "PDF 변환";
+            this.list_menu_convert_pdf.Text = "PDF로 변환";
             this.list_menu_convert_pdf.Click += new System.EventHandler(this.list_menu_convert_pdf_Click);
             // 
             // list_menu_convert_hwpx
@@ -168,7 +168,7 @@
             this.list_menu_convert_hwpx.Name = "list_menu_convert_hwpx";
             this.list_menu_convert_hwpx.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
             this.list_menu_convert_hwpx.Size = new System.Drawing.Size(196, 22);
-            this.list_menu_convert_hwpx.Text = "HWPX 변환";
+            this.list_menu_convert_hwpx.Text = "HWPX로 변환";
             // 
             // toolStripSeparator2
             // 
@@ -250,18 +250,20 @@
             this.text_title.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.text_title.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.text_title.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.text_title.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.text_title.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.text_title.Font = new System.Drawing.Font("맑은 고딕", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.text_title.ForeColor = System.Drawing.SystemColors.WindowFrame;
             this.text_title.Location = new System.Drawing.Point(12, 12);
             this.text_title.MinimumSize = new System.Drawing.Size(300, 4);
             this.text_title.Multiline = true;
             this.text_title.Name = "text_title";
             this.text_title.ReadOnly = true;
-            this.text_title.Size = new System.Drawing.Size(658, 71);
+            this.text_title.Size = new System.Drawing.Size(658, 69);
             this.text_title.TabIndex = 8;
             this.text_title.TabStop = false;
-            this.text_title.Text = "설치된 \'한글(HWP)\'을 활용하여 지정된 파일을 PDF 파일로 변환합니다.\r\n아래 목록에 끌어서 놓기로 추가한 후 \'변환\' 버튼을 클릭해 주세요" +
-    ".\r\n※ HWP, HWPX, HML, RTF, Unicode TXT, DOC, DOCX 확장자를 변환할 수 있습니다.";
+            this.text_title.Text = "아래 목록에 포함된 파일을 PDF 또는 HWPX 파일로 변환합니다.\r\nHWP, HWPX, HML, RTF, TXT, DOC, DOCX 파일을 변환" +
+    "할 수 있습니다.\r\n파일을 끌어서 놓기나 우클릭 메뉴로 추가하고 변환 버튼을 클릭해 주세요.";
+            this.text_title.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // axHwpCtrl1
             // 
@@ -314,7 +316,7 @@
             // 
             // btn_config
             // 
-            this.btn_config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_config.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.btn_config.Location = new System.Drawing.Point(550, 333);
             this.btn_config.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -348,7 +350,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
-            this.Text = "HWP -> PDF 변환기 v1.1";
+            this.Text = "hwp2pdf v1.2";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
