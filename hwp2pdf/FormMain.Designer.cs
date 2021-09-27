@@ -169,6 +169,7 @@
             this.list_menu_convert_hwpx.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
             this.list_menu_convert_hwpx.Size = new System.Drawing.Size(196, 22);
             this.list_menu_convert_hwpx.Text = "HWPX로 변환";
+            this.list_menu_convert_hwpx.Click += new System.EventHandler(this.list_menu_convert_hwpx_Click);
             // 
             // toolStripSeparator2
             // 

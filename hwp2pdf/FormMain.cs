@@ -461,6 +461,7 @@ namespace hwp2pdf
             contextMenu_list.Items[1].Enabled = (list_file.SelectedItems.Count > 0);
             contextMenu_list.Items[2].Enabled = (list_file.Items.Count > 0);
             contextMenu_list.Items[4].Enabled = (list_file.Items.Count > 0);
+            contextMenu_list.Items[5].Enabled = (list_file.Items.Count > 0);
         }
 
         [DllImport("kernel32")]
