@@ -41,6 +41,7 @@
             this.list_menu_clear = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.list_menu_convert_pdf = new System.Windows.Forms.ToolStripMenuItem();
+            this.list_menu_convert_hwp = new System.Windows.Forms.ToolStripMenuItem();
             this.list_menu_convert_hwpx = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.list_menu_exit = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,6 +56,7 @@
             this.textSavePath = new System.Windows.Forms.TextBox();
             this.btn_convert_hwpx = new System.Windows.Forms.Button();
             this.btn_config = new System.Windows.Forms.Button();
+            this.btn_convert_hwp = new System.Windows.Forms.Button();
             this.contextMenu_list.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).BeginInit();
             this.SuspendLayout();
@@ -102,7 +104,7 @@
             this.list_file.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.list_file.MinimumSize = new System.Drawing.Size(300, 200);
             this.list_file.Name = "list_file";
-            this.list_file.Size = new System.Drawing.Size(532, 238);
+            this.list_file.Size = new System.Drawing.Size(532, 284);
             this.list_file.SmallImageList = this.imageList_file;
             this.list_file.TabIndex = 0;
             this.list_file.UseCompatibleStateImageBehavior = false;
@@ -119,11 +121,12 @@
             this.list_menu_clear,
             this.toolStripSeparator1,
             this.list_menu_convert_pdf,
+            this.list_menu_convert_hwp,
             this.list_menu_convert_hwpx,
             this.toolStripSeparator2,
             this.list_menu_exit});
             this.contextMenu_list.Name = "contextMenu_list";
-            this.contextMenu_list.Size = new System.Drawing.Size(197, 148);
+            this.contextMenu_list.Size = new System.Drawing.Size(197, 170);
             this.contextMenu_list.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_list_Opening);
             // 
             // list_menu_add
@@ -163,13 +166,21 @@
             this.list_menu_convert_pdf.Text = "PDF로 변환";
             this.list_menu_convert_pdf.Click += new System.EventHandler(this.list_menu_convert_pdf_Click);
             // 
+            // list_menu_convert_hwp
+            // 
+            this.list_menu_convert_hwp.Name = "list_menu_convert_hwpx";
+            this.list_menu_convert_hwp.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+            this.list_menu_convert_hwp.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_convert_hwp.Text = "HWPX로 변환";
+            this.list_menu_convert_hwp.Click += new System.EventHandler(this.list_menu_convert_hwpx_Click);
+            // 
             // list_menu_convert_hwpx
             // 
-            this.list_menu_convert_hwpx.Name = "list_menu_convert_hwpx";
-            this.list_menu_convert_hwpx.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+            this.list_menu_convert_hwpx.Name = "list_menu_convert_hwp";
+            this.list_menu_convert_hwpx.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.list_menu_convert_hwpx.Size = new System.Drawing.Size(196, 22);
-            this.list_menu_convert_hwpx.Text = "HWPX로 변환";
-            this.list_menu_convert_hwpx.Click += new System.EventHandler(this.list_menu_convert_hwpx_Click);
+            this.list_menu_convert_hwpx.Text = "HWP로 변환";
+            this.list_menu_convert_hwpx.Click += new System.EventHandler(this.list_menu_convert_hwp_Click);
             // 
             // toolStripSeparator2
             // 
@@ -207,11 +218,11 @@
             // 
             this.btn_clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_clear.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_clear.Location = new System.Drawing.Point(550, 211);
+            this.btn_clear.Location = new System.Drawing.Point(550, 256);
             this.btn_clear.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_clear.Name = "btn_clear";
             this.btn_clear.Size = new System.Drawing.Size(120, 41);
-            this.btn_clear.TabIndex = 4;
+            this.btn_clear.TabIndex = 5;
             this.btn_clear.Text = "목록 초기화";
             this.btn_clear.UseVisualStyleBackColor = true;
             this.btn_clear.Click += new System.EventHandler(this.btn_clear_Click);
@@ -221,7 +232,7 @@
             this.text_log.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.text_log.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.text_log.Location = new System.Drawing.Point(12, 364);
+            this.text_log.Location = new System.Drawing.Point(12, 410);
             this.text_log.MinimumSize = new System.Drawing.Size(300, 4);
             this.text_log.Multiline = true;
             this.text_log.Name = "text_log";
@@ -237,11 +248,11 @@
             this.btn_close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_close.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btn_close.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_close.Location = new System.Drawing.Point(550, 363);
+            this.btn_close.Location = new System.Drawing.Point(550, 409);
             this.btn_close.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_close.Name = "btn_close";
             this.btn_close.Size = new System.Drawing.Size(120, 50);
-            this.btn_close.TabIndex = 6;
+            this.btn_close.TabIndex = 7;
             this.btn_close.Text = "종료";
             this.btn_close.UseVisualStyleBackColor = true;
             this.btn_close.Click += new System.EventHandler(this.btn_close_Click);
@@ -262,14 +273,14 @@
             this.text_title.Size = new System.Drawing.Size(658, 69);
             this.text_title.TabIndex = 8;
             this.text_title.TabStop = false;
-            this.text_title.Text = "아래 목록에 포함된 파일을 PDF 또는 HWPX 파일로 변환합니다.\r\nHWP, HWPX, HML, RTF, TXT, DOC, DOCX 파일을 변환" +
-    "할 수 있습니다.\r\n파일을 끌어서 놓기나 우클릭 메뉴로 추가하고 변환 버튼을 클릭해 주세요.";
+            this.text_title.Text = "아래 목록에 포함된 파일을 PDF, HWPX, HWP 파일로 변환합니다.\r\nHWP, HWPX, HML, RTF, TXT, DOC, DOCX 파일을" +
+    " 변환할 수 있습니다.\r\n파일을 끌어서 놓기나 우클릭 메뉴로 추가하고 변환 버튼을 클릭해 주세요.";
             this.text_title.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // axHwpCtrl1
             // 
             this.axHwpCtrl1.Enabled = true;
-            this.axHwpCtrl1.Location = new System.Drawing.Point(552, 259);
+            this.axHwpCtrl1.Location = new System.Drawing.Point(552, 310);
             this.axHwpCtrl1.Name = "axHwpCtrl1";
             this.axHwpCtrl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axHwpCtrl1.OcxState")));
             this.axHwpCtrl1.Size = new System.Drawing.Size(120, 62);
@@ -319,21 +330,35 @@
             // 
             this.btn_config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_config.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_config.Location = new System.Drawing.Point(550, 333);
+            this.btn_config.Location = new System.Drawing.Point(550, 379);
             this.btn_config.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_config.Name = "btn_config";
             this.btn_config.Size = new System.Drawing.Size(120, 24);
-            this.btn_config.TabIndex = 5;
+            this.btn_config.TabIndex = 6;
             this.btn_config.Text = "설정...";
             this.btn_config.UseVisualStyleBackColor = true;
             this.btn_config.Click += new System.EventHandler(this.btn_config_Click);
+            // 
+            // btn_convert_hwp
+            // 
+            this.btn_convert_hwp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_convert_hwp.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btn_convert_hwp.Location = new System.Drawing.Point(550, 210);
+            this.btn_convert_hwp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btn_convert_hwp.Name = "btn_convert_hwp";
+            this.btn_convert_hwp.Size = new System.Drawing.Size(120, 41);
+            this.btn_convert_hwp.TabIndex = 4;
+            this.btn_convert_hwp.Text = "HWP로 변환";
+            this.btn_convert_hwp.UseVisualStyleBackColor = true;
+            this.btn_convert_hwp.Click += new System.EventHandler(this.btn_convert_hwp_Click);
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btn_close;
-            this.ClientSize = new System.Drawing.Size(684, 426);
+            this.ClientSize = new System.Drawing.Size(684, 472);
+            this.Controls.Add(this.btn_convert_hwp);
             this.Controls.Add(this.btn_config);
             this.Controls.Add(this.btn_convert_hwpx);
             this.Controls.Add(this.textSavePath);
@@ -351,7 +376,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
-            this.Text = "hwp2pdf v1.2";
+            this.Text = "hwp2pdf v1.3";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
@@ -387,6 +412,8 @@
         private System.Windows.Forms.ToolStripMenuItem list_menu_convert_hwpx;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.Button btn_config;
+        private System.Windows.Forms.Button btn_convert_hwp;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_convert_hwp;
     }
 }
 

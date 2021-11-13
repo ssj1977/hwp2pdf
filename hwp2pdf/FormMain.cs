@@ -180,6 +180,8 @@ namespace hwp2pdf
                 else            btn_convert_pdf.Text = "변환 중단";
                 if (bEnable)    btn_convert_hwpx.Text = "HWPX로 변환";
                 else            btn_convert_hwpx.Text = "변환 중단";
+                if (bEnable)    btn_convert_hwp.Text = "HWP로 변환";
+                else            btn_convert_hwp.Text = "변환 중단";
             }
         }
         private void convert_files()
@@ -189,6 +191,7 @@ namespace hwp2pdf
                 st_bConverting = false;
                 btn_convert_pdf.Enabled = false;
                 btn_convert_hwpx.Enabled = false;
+                btn_convert_hwp.Enabled = false;
                 return;
             }
             if (list_file.Items.Count <= 0) return;
@@ -317,6 +320,17 @@ namespace hwp2pdf
             st_format = "HWPX";
             convert_files();
         }
+        private void btn_convert_hwp_Click(object sender, EventArgs e)
+        {
+            st_format = "HWP";
+            convert_files();
+        }
+        private void list_menu_convert_hwp_Click(object sender, EventArgs e)
+        {
+            st_format = "HWP";
+            convert_files();
+        }
+
         private void list_file_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
