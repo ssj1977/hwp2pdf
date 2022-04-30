@@ -19,6 +19,7 @@ namespace hwp2pdf
         static bool st_bConverting = false;
         static string st_format = "PDF";
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
+        int option_extflag = (1 | 2 | 4); //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
         public FormMain()
         {
             InitializeComponent();
@@ -31,6 +32,8 @@ namespace hwp2pdf
             if (strTemp.Length > 0) m_bUseCurrentPath = bool.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "OptionOverwrite", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0) option_overwrite = int.Parse(strTemp.ToString());
+            GetPrivateProfileString("Main", "OptionExtFlag", "", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) option_extflag = int.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "Bounds", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0)
             {
@@ -52,10 +55,6 @@ namespace hwp2pdf
                 if (SystemInformation.VirtualScreen.IntersectsWith(temp_rect) == true)
                 {
                     this.SetDesktopBounds(x, y, w, h);
-                }
-                else
-                {
-                    int xzz = 1;
                 }
             }
 
@@ -348,34 +347,51 @@ namespace hwp2pdf
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             Array.Sort(files, new FileNameComparer());
-            add_files(files);
+            int nAdded = add_files(files, 0xFFFF); //처음 파일 추가시는 모든 확장자를 인식하도록
+            add_log(String.Format("{0}개를 목록에 추가하였습니다.", nAdded));
         }
-        private void add_files(string[] files)
+        private int add_files(string[] files, int extflag)
         {
-            int nTotal = 0, nAdded = 0;
+            int nAdded = 0;
             foreach (string file in files)
             {
-                nTotal++;
-                string file_ext = System.IO.Path.GetExtension(file).ToUpper();
-                if (file_ext.Equals(".HWP") 
-                    || file_ext.Equals(".HWPX")
-                    || file_ext.Equals(".HML")
-                    || file_ext.Equals(".DOC")
-                    || file_ext.Equals(".DOCX")
-                    || file_ext.Equals(".RTF")
-                    || file_ext.Equals(".TXT"))
+                FileAttributes attr = System.IO.File.GetAttributes(file);
+                if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    if (CheckDuplication(System.IO.Path.GetFullPath(file)) == false)
+                    string[] dirs_only = Directory.GetDirectories(file);
+                    string[] files_only = Directory.GetFiles(file);
+                    nAdded += add_files(dirs_only, option_extflag); //폴더 내의 파일을 모두 가져올때는 정해진 확장자만
+                    nAdded += add_files(files_only, option_extflag);
+                }
+                else
+                {
+                    string file_ext = System.IO.Path.GetExtension(file).ToUpper();
+                    if ( (file_ext.Equals(".HWP") && ((extflag & 1)!=0))
+                        || (file_ext.Equals(".HWPX") && ((extflag & 2) != 0))
+                        || (file_ext.Equals(".HML") && ((extflag & 4) != 0))
+                        || (file_ext.Equals(".DOC") && ((extflag & 8) != 0))
+                        || (file_ext.Equals(".DOCX") && ((extflag & 16) != 0))
+                        || (file_ext.Equals(".RTF") && ((extflag & 32) != 0))
+                        || (file_ext.Equals(".TXT") && ((extflag & 64) != 0)))
                     {
-                        ListViewItem newItem = list_file.Items.Add(System.IO.Path.GetFileName(file), 0);
-                        newItem.SubItems.Add(System.IO.Path.GetDirectoryName(file));
-                        newItem.SubItems.Add("");
-                        newItem.SubItems.Add(System.IO.Path.GetFullPath(file));
-                        nAdded++;
+                        if (CheckDuplication(System.IO.Path.GetFullPath(file)) == false)
+                        {
+                            Icon iconForFile = SystemIcons.WinLogo;
+                            if (!imageList_file.Images.ContainsKey(file_ext))
+                            {
+                                iconForFile = System.Drawing.Icon.ExtractAssociatedIcon(file);
+                                imageList_file.Images.Add(file_ext, iconForFile);
+                            }
+                            ListViewItem newItem = list_file.Items.Add(System.IO.Path.GetFileName(file), file_ext);
+                            newItem.SubItems.Add(System.IO.Path.GetDirectoryName(file));
+                            newItem.SubItems.Add("");
+                            newItem.SubItems.Add(System.IO.Path.GetFullPath(file));
+                            nAdded++;
+                        }
                     }
                 }
             }
-            add_log(String.Format("{0}개 파일 중 {1}개를 목록에 추가하였습니다.", nTotal, nAdded));
+            return nAdded;
         }
         private void list_file_DrawColumnHeader(object sender, DrawListViewColumnHeaderEventArgs e)
         {
@@ -413,6 +429,7 @@ namespace hwp2pdf
             if (m_bUseCurrentPath == true) m_strSavePath = "";
             WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
             WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path);
+            WritePrivateProfileString("Main", "OptionExtFlag", option_extflag.ToString(), ini_path);
             String strTemp;
             if (WindowState == FormWindowState.Maximized || WindowState==FormWindowState.Minimized)
             {
@@ -460,7 +477,8 @@ namespace hwp2pdf
             {
                 string[] files = dlg.FileNames;
                 Array.Sort(files, new FileNameComparer());
-                add_files(files);
+                int nAdded = add_files(files, 0xFFFF);
+                add_log(String.Format("{0}개를 목록에 추가하였습니다.", nAdded));
             }
         }
         private void list_menu_delete_Click(object sender, EventArgs e)
@@ -486,10 +504,11 @@ namespace hwp2pdf
         private void btn_config_Click(object sender, EventArgs e)
         {
             FormConfig dlg = new FormConfig();
-            dlg.setOption(option_overwrite);
+            dlg.setOption(option_overwrite, option_extflag);
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 option_overwrite = dlg.get_option_overwrite();
+                option_extflag = dlg.get_option_extflag();
             }
         }
     }

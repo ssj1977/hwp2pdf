@@ -97,6 +97,7 @@
             this.col_fullpath});
             this.list_file.ContextMenuStrip = this.contextMenu_list;
             this.list_file.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.list_file.ForeColor = System.Drawing.SystemColors.WindowText;
             this.list_file.FullRowSelect = true;
             this.list_file.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.list_file.HideSelection = false;
@@ -168,7 +169,7 @@
             // 
             // list_menu_convert_hwp
             // 
-            this.list_menu_convert_hwp.Name = "list_menu_convert_hwpx";
+            this.list_menu_convert_hwp.Name = "list_menu_convert_hwp";
             this.list_menu_convert_hwp.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
             this.list_menu_convert_hwp.Size = new System.Drawing.Size(196, 22);
             this.list_menu_convert_hwp.Text = "HWPX로 변환";
@@ -176,7 +177,7 @@
             // 
             // list_menu_convert_hwpx
             // 
-            this.list_menu_convert_hwpx.Name = "list_menu_convert_hwp";
+            this.list_menu_convert_hwpx.Name = "list_menu_convert_hwpx";
             this.list_menu_convert_hwpx.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.list_menu_convert_hwpx.Size = new System.Drawing.Size(196, 22);
             this.list_menu_convert_hwpx.Text = "HWP로 변환";
@@ -197,9 +198,9 @@
             // 
             // imageList_file
             // 
-            this.imageList_file.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList_file.ImageStream")));
+            this.imageList_file.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.imageList_file.ImageSize = new System.Drawing.Size(16, 16);
             this.imageList_file.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageList_file.Images.SetKeyName(0, "hwp.png");
             // 
             // btn_convert_pdf
             // 
@@ -376,7 +377,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
-            this.Text = "hwp2pdf v1.3";
+            this.Text = "hwp2pdf v1.4";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
