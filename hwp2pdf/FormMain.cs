@@ -14,6 +14,8 @@ namespace hwp2pdf
 {
     public partial class FormMain : Form
     {
+        string m_strPrinter = ""; //PDF 변환용 가상 프린터 이름
+        int m_nPrintMethod = 0;
         bool m_bUseCurrentPath = true;
         string m_strSavePath = "";
         static bool st_bConverting = false;
@@ -34,6 +36,10 @@ namespace hwp2pdf
             if (strTemp.Length > 0) option_overwrite = int.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "OptionExtFlag", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0) option_extflag = int.Parse(strTemp.ToString());
+            GetPrivateProfileString("Main", "PrinterName", "", strTemp, strTemp.Capacity, ini_path);
+            m_strPrinter = strTemp.ToString();
+            GetPrivateProfileString("Main", "PrintMethod", "", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) m_nPrintMethod = int.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "Bounds", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0)
             {
@@ -64,7 +70,7 @@ namespace hwp2pdf
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
             if (reg == null)
             {
-                MessageBox.Show("한/글(2010 이상 버전)이 설치되어 있지 않습니다.");
+                MessageBox.Show("한컴오피스 한글2010 이상 버전이 설치되어 있지 않습니다.");
                 return;
             }
             reg = reg.CreateSubKey("HwpCtrl");
@@ -120,7 +126,32 @@ namespace hwp2pdf
             }
             else
             {
-                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다..");
+                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다.");
+            }
+            // PDF 변환용 프린터가 설치되어 있는지 확인
+            System.Collections.ArrayList printer_names 
+                = new System.Collections.ArrayList(System.Drawing.Printing.PrinterSettings.InstalledPrinters);
+            bool bPrinterInstalled = false;
+            for (int i=0; i<printer_names.Count; i++)
+            {
+                string name = printer_names[i].ToString();
+                if (name.Contains("PDF"))
+                {
+                    bPrinterInstalled = true;
+                    if (name.Contains("Hancom PDF"))
+                    {
+                        m_strPrinter = name;
+                        break;  //한컴PDF가 있으면 기본 프린터로 사용
+                    }
+                    if (name.Contains("Microsoft Print to PDF"))
+                    {
+                        m_strPrinter = name; //한컴PDF가 없는 경우 MS PDF 사용
+                    }
+                }
+            }
+            if (bPrinterInstalled == false)
+            {
+                MessageBox.Show("한컴 PDF 또는 Micosoft Print to PDF가 설치되어 있지 않습니다.");
             }
 
             if (axHwpCtrl1.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample"))
@@ -156,8 +187,9 @@ namespace hwp2pdf
             }
             else
             {
-                list_file.Items[nRow].SubItems[2].Text = text;
+                list_file.Items[nRow].SubItems[3].Text = text;
                 list_file.RedrawItems(nRow, nRow, false);
+                list_file.EnsureVisible(nRow);
             }
         }
         private void enable_controls(bool bEnable)
@@ -198,8 +230,8 @@ namespace hwp2pdf
             int nIndex = 0;
             foreach (ListViewItem item in list_file.Items)
             {
-                paths[nIndex] = item.SubItems[3].Text;
-                item.SubItems[2].Text = "";
+                paths[nIndex] = Path.Combine(item.SubItems[1].Text, item.SubItems[0].Text);
+                item.SubItems[3].Text = "";
                 nIndex++;
             }
             Thread th = new Thread(() => convert_thread(paths, m_bUseCurrentPath, m_strSavePath));
@@ -210,9 +242,10 @@ namespace hwp2pdf
         }
         private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
         {
-            AxHwpCtrl temp_hwp = new AxHwpCtrl();
-            temp_hwp.CreateControl();
-            bool bReg = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
+            //AxHwpCtrl temp_hwp = new AxHwpCtrl();
+            //temp_hwp.CreateControl();
+            //bool bReg = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
+            AxHwpCtrl temp_hwp = axHwpCtrl1;
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
@@ -231,7 +264,7 @@ namespace hwp2pdf
                 {
                     show_convert_state(nRow, "변환안함(같은형식)");
                 }
-                else if (temp_hwp.Open(file_path, file_type, ""))
+                else if (temp_hwp.Open(file_path, file_type, "lock:false;forceopen:true;")) //
                 {
                     show_convert_state(nRow, "변환중");
                     string save_path = "";
@@ -276,10 +309,35 @@ namespace hwp2pdf
                     }
                     else
                     {
-                        if (temp_hwp.SaveAs(save_path, st_format, ""))
+                        bool bSuccess = false;
+                        if (st_format == "PDF" && m_strPrinter != "")
                         {
-                            if (bOverwirte == true) show_convert_state(nRow, "완료 : 덮어씀");
-                            else if (bChanged == true) show_convert_state(nRow, "완료 : " + System.IO.Path.GetFileName(save_path));
+                            //PDF 파일의 경우 가상 프린터를 사용하는 방식으로 변환 가능
+                            //인쇄 모아쓰기 설정을 변경할 수 있지만 인쇄 팝업이 잠시 떴다 사라짐
+                            //가상 프린터를 쓰지 않는 경우는 기존의 SaveAS 방식으로 변환
+                            HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
+                            HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
+                            act.GetDefault(pset);
+                            pset.SetItem("PrintMethod", m_nPrintMethod);
+                            pset.SetItem("PrintToFile", 1);
+                            pset.SetItem("FileName", save_path);
+                            pset.SetItem("Device", 3);
+                            pset.SetItem("PrinterName", m_strPrinter);
+                            pset.SetItem("Flags", 8192);
+                            if (act.Execute(pset) == 1)
+                            {
+                                bSuccess = true;
+                            }
+                        }
+                        else
+                        {
+                            //SaveAs의 경우 PDF 변환시 HWP파일의 모아찍기 설정은 그대로 유지됨
+                            bSuccess = temp_hwp.SaveAs(save_path, st_format, "");
+                        }
+                        if (bSuccess)
+                        {
+                            if (bOverwirte == true) show_convert_state(nRow, "완료(덮어씀)");
+                            else if (bChanged == true) show_convert_state(nRow, "완료(이름바꿈) - " + System.IO.Path.GetFileName(save_path));
                             else show_convert_state(nRow, "완료");
                             nConverted++;
                         }
@@ -338,7 +396,8 @@ namespace hwp2pdf
         {
             foreach (ListViewItem item in list_file.Items)
             {
-                if (filepath.Equals(item.SubItems[3].Text, StringComparison.CurrentCultureIgnoreCase))
+                string anotherpath = Path.Combine(item.SubItems[0].Text, item.SubItems[1].Text);
+                if (filepath.Equals(anotherpath, StringComparison.CurrentCultureIgnoreCase))
                     return true;
             }
             return false;
@@ -349,6 +408,19 @@ namespace hwp2pdf
             Array.Sort(files, new FileNameComparer());
             int nAdded = add_files(files, 0xFFFF); //처음 파일 추가시는 모든 확장자를 인식하도록
             add_log(String.Format("{0}개를 목록에 추가하였습니다.", nAdded));
+        }
+        private string GetFileSizeString(double byteCount)
+        {
+            string size = "0 Bytes";
+            if (byteCount >= 1073741824.0)
+                size = String.Format("{0:##.##}", byteCount / 1073741824.0) + " GB";
+            else if (byteCount >= 1048576.0)
+                size = String.Format("{0:##.##}", byteCount / 1048576.0) + " MB";
+            else if (byteCount >= 1024.0)
+                size = String.Format("{0:##.##}", byteCount / 1024.0) + " KB";
+            else if (byteCount > 0 && byteCount < 1024.0)
+                size = byteCount.ToString() + " Bytes";
+            return size;
         }
         private int add_files(string[] files, int extflag)
         {
@@ -365,8 +437,10 @@ namespace hwp2pdf
                 }
                 else
                 {
-                    string file_ext = System.IO.Path.GetExtension(file).ToUpper();
-                    if ( (file_ext.Equals(".HWP") && ((extflag & 1)!=0))
+                    FileInfo fInfo = new FileInfo(System.IO.Path.GetFullPath(file));
+                    string file_size = GetFileSizeString(fInfo.Length);
+                    string file_ext = fInfo.Extension.ToUpper();
+                    if ((file_ext.Equals(".HWP") && ((extflag & 1) != 0))
                         || (file_ext.Equals(".HWPX") && ((extflag & 2) != 0))
                         || (file_ext.Equals(".HML") && ((extflag & 4) != 0))
                         || (file_ext.Equals(".DOC") && ((extflag & 8) != 0))
@@ -374,7 +448,7 @@ namespace hwp2pdf
                         || (file_ext.Equals(".RTF") && ((extflag & 32) != 0))
                         || (file_ext.Equals(".TXT") && ((extflag & 64) != 0)))
                     {
-                        if (CheckDuplication(System.IO.Path.GetFullPath(file)) == false)
+                        if (CheckDuplication(fInfo.FullName) == false)
                         {
                             Icon iconForFile = SystemIcons.WinLogo;
                             if (!imageList_file.Images.ContainsKey(file_ext))
@@ -382,11 +456,68 @@ namespace hwp2pdf
                                 iconForFile = System.Drawing.Icon.ExtractAssociatedIcon(file);
                                 imageList_file.Images.Add(file_ext, iconForFile);
                             }
-                            ListViewItem newItem = list_file.Items.Add(System.IO.Path.GetFileName(file), file_ext);
-                            newItem.SubItems.Add(System.IO.Path.GetDirectoryName(file));
-                            newItem.SubItems.Add("");
-                            newItem.SubItems.Add(System.IO.Path.GetFullPath(file));
+                            ListViewItem newItem = list_file.Items.Add(fInfo.Name, file_ext);
+                            newItem.SubItems.Add(fInfo.DirectoryName);
+                            newItem.SubItems.Add(GetFileSizeString(fInfo.Length)); // 크기
+                            newItem.SubItems.Add(""); // 처리상태
                             nAdded++;
+                            /*HWP 파일의 모아찍기 상태를 확인한다. --> 속도가 느려지므로 나중에는 별도 실행 기능으로
+                            string etcinfo = "";
+                            if (file_ext.Equals(".HWP") || file_ext.Equals(".HWPX"))
+                            {
+                                AxHwpCtrl temp_hwp = axHwpCtrl1;
+                                string file_path = System.IO.Path.GetFullPath(file);
+                                string file_type = "";
+                                if (file_ext.Equals(".HWP")) file_type = "HWP";
+                                else if (file_ext.Equals(".HWPX")) file_type = "HWPX";
+                                if (temp_hwp.Open(file_path, file_type, "lock:false;forceopen:true")) //lock:false;forceopen:true;
+                                {
+                                    HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
+                                    HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
+                                    act.GetDefault(pset);
+                                    var print_method = pset.Item("PrintMethod");
+                                    switch (int.Parse(print_method.ToString()))
+                                    {
+                                        case 0:
+                                            etcinfo = ""; //"기본 인쇄";
+                                            break;
+                                        case 1:
+                                            etcinfo = ""; //"용지 맞춤";
+                                            break;
+                                        case 2:
+                                            etcinfo = ""; // "나눠 찍기";
+                                            break;
+                                        case 3:
+                                            etcinfo = "2쪽 모아찍기";
+                                            break;
+                                        case 4:
+                                            etcinfo = "3쪽 모아찍기";
+                                            break;
+                                        case 5:
+                                            etcinfo = "4쪽 모아찍기";
+                                            break;
+                                        case 6:
+                                            etcinfo = "4쪽 모아찍기";
+                                            break;
+                                        case 7:
+                                            etcinfo = "6쪽 모아찍기";
+                                            break;
+                                        case 8:
+                                            etcinfo = "8쪽 모아찍기";
+                                            break;
+                                        case 9:
+                                            etcinfo = "9쪽 모아찍기";
+                                            break;
+                                        case 10:
+                                            etcinfo = "16쪽 모아찍기";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    temp_hwp.Clear();
+                                }
+                            }
+                            newItem.SubItems.Add(etcinfo);*/
                         }
                     }
                 }
@@ -430,6 +561,8 @@ namespace hwp2pdf
             WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
             WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path);
             WritePrivateProfileString("Main", "OptionExtFlag", option_extflag.ToString(), ini_path);
+            WritePrivateProfileString("Main", "PrinterName", m_strPrinter, ini_path);
+            WritePrivateProfileString("Main", "PrintMethod", m_nPrintMethod.ToString(), ini_path);
             String strTemp;
             if (WindowState == FormWindowState.Maximized || WindowState==FormWindowState.Minimized)
             {
@@ -447,13 +580,13 @@ namespace hwp2pdf
         {
             FormSetSavePath dlg = new FormSetSavePath();
             dlg.setOption(m_bUseCurrentPath, m_strSavePath);
-             if (dlg.ShowDialog() == DialogResult.OK)
+                if (dlg.ShowDialog() == DialogResult.OK)
             {
                 m_bUseCurrentPath = dlg.IsUseCurrentPath();
                 m_strSavePath = dlg.getSavePath();
                 update_path();
             }
-            
+
         }
         private void update_path()
         {

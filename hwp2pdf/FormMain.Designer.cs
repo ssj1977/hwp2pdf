@@ -33,7 +33,7 @@
             this.col_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_path = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.col_status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.col_fullpath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.col_size = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.list_file = new System.Windows.Forms.ListView();
             this.contextMenu_list = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.list_menu_add = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,17 +69,19 @@
             // col_path
             // 
             this.col_path.Text = "파일위치";
-            this.col_path.Width = 180;
+            this.col_path.Width = 160;
             // 
             // col_status
             // 
             this.col_status.Text = "처리상태";
-            this.col_status.Width = 180;
+            this.col_status.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.col_status.Width = 120;
             // 
-            // col_fullpath
+            // col_size
             // 
-            this.col_fullpath.Text = "전체경로";
-            this.col_fullpath.Width = 0;
+            this.col_size.Text = "파일크기";
+            this.col_size.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.col_size.Width = 80;
             // 
             // list_file
             // 
@@ -93,8 +95,8 @@
             this.list_file.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.col_name,
             this.col_path,
-            this.col_status,
-            this.col_fullpath});
+            this.col_size,
+            this.col_status});
             this.list_file.ContextMenuStrip = this.contextMenu_list;
             this.list_file.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.list_file.ForeColor = System.Drawing.SystemColors.WindowText;
@@ -105,7 +107,7 @@
             this.list_file.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.list_file.MinimumSize = new System.Drawing.Size(300, 200);
             this.list_file.Name = "list_file";
-            this.list_file.Size = new System.Drawing.Size(532, 284);
+            this.list_file.Size = new System.Drawing.Size(581, 282);
             this.list_file.SmallImageList = this.imageList_file;
             this.list_file.TabIndex = 0;
             this.list_file.UseCompatibleStateImageBehavior = false;
@@ -206,7 +208,7 @@
             // 
             this.btn_convert_pdf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_convert_pdf.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert_pdf.Location = new System.Drawing.Point(550, 118);
+            this.btn_convert_pdf.Location = new System.Drawing.Point(599, 118);
             this.btn_convert_pdf.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_convert_pdf.Name = "btn_convert_pdf";
             this.btn_convert_pdf.Size = new System.Drawing.Size(120, 41);
@@ -219,7 +221,7 @@
             // 
             this.btn_clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_clear.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_clear.Location = new System.Drawing.Point(550, 256);
+            this.btn_clear.Location = new System.Drawing.Point(599, 256);
             this.btn_clear.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_clear.Name = "btn_clear";
             this.btn_clear.Size = new System.Drawing.Size(120, 41);
@@ -233,13 +235,13 @@
             this.text_log.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.text_log.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.text_log.Location = new System.Drawing.Point(12, 410);
+            this.text_log.Location = new System.Drawing.Point(12, 408);
             this.text_log.MinimumSize = new System.Drawing.Size(300, 4);
             this.text_log.Multiline = true;
             this.text_log.Name = "text_log";
             this.text_log.ReadOnly = true;
             this.text_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.text_log.Size = new System.Drawing.Size(532, 50);
+            this.text_log.Size = new System.Drawing.Size(581, 50);
             this.text_log.TabIndex = 6;
             this.text_log.TabStop = false;
             this.text_log.WordWrap = false;
@@ -249,7 +251,7 @@
             this.btn_close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_close.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btn_close.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_close.Location = new System.Drawing.Point(550, 409);
+            this.btn_close.Location = new System.Drawing.Point(599, 407);
             this.btn_close.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_close.Name = "btn_close";
             this.btn_close.Size = new System.Drawing.Size(120, 50);
@@ -271,7 +273,7 @@
             this.text_title.Multiline = true;
             this.text_title.Name = "text_title";
             this.text_title.ReadOnly = true;
-            this.text_title.Size = new System.Drawing.Size(658, 69);
+            this.text_title.Size = new System.Drawing.Size(707, 69);
             this.text_title.TabIndex = 8;
             this.text_title.TabStop = false;
             this.text_title.Text = "아래 목록에 포함된 파일을 PDF, HWPX, HWP 파일로 변환합니다.\r\nHWP, HWPX, HML, RTF, TXT, DOC, DOCX 파일을" +
@@ -281,10 +283,10 @@
             // axHwpCtrl1
             // 
             this.axHwpCtrl1.Enabled = true;
-            this.axHwpCtrl1.Location = new System.Drawing.Point(552, 310);
+            this.axHwpCtrl1.Location = new System.Drawing.Point(599, 304);
             this.axHwpCtrl1.Name = "axHwpCtrl1";
             this.axHwpCtrl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axHwpCtrl1.OcxState")));
-            this.axHwpCtrl1.Size = new System.Drawing.Size(120, 62);
+            this.axHwpCtrl1.Size = new System.Drawing.Size(120, 70);
             this.axHwpCtrl1.TabIndex = 9;
             this.axHwpCtrl1.TabStop = false;
             this.axHwpCtrl1.Visible = false;
@@ -293,7 +295,7 @@
             // 
             this.btnSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSavePath.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnSavePath.Location = new System.Drawing.Point(550, 88);
+            this.btnSavePath.Location = new System.Drawing.Point(599, 88);
             this.btnSavePath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSavePath.Name = "btnSavePath";
             this.btnSavePath.Size = new System.Drawing.Size(120, 24);
@@ -310,7 +312,7 @@
             this.textSavePath.Location = new System.Drawing.Point(12, 89);
             this.textSavePath.Name = "textSavePath";
             this.textSavePath.ReadOnly = true;
-            this.textSavePath.Size = new System.Drawing.Size(532, 23);
+            this.textSavePath.Size = new System.Drawing.Size(581, 23);
             this.textSavePath.TabIndex = 12;
             this.textSavePath.TabStop = false;
             // 
@@ -318,7 +320,7 @@
             // 
             this.btn_convert_hwpx.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_convert_hwpx.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert_hwpx.Location = new System.Drawing.Point(550, 164);
+            this.btn_convert_hwpx.Location = new System.Drawing.Point(599, 164);
             this.btn_convert_hwpx.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_convert_hwpx.Name = "btn_convert_hwpx";
             this.btn_convert_hwpx.Size = new System.Drawing.Size(120, 41);
@@ -331,7 +333,7 @@
             // 
             this.btn_config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_config.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_config.Location = new System.Drawing.Point(550, 379);
+            this.btn_config.Location = new System.Drawing.Point(599, 377);
             this.btn_config.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_config.Name = "btn_config";
             this.btn_config.Size = new System.Drawing.Size(120, 24);
@@ -344,7 +346,7 @@
             // 
             this.btn_convert_hwp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_convert_hwp.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert_hwp.Location = new System.Drawing.Point(550, 210);
+            this.btn_convert_hwp.Location = new System.Drawing.Point(599, 210);
             this.btn_convert_hwp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_convert_hwp.Name = "btn_convert_hwp";
             this.btn_convert_hwp.Size = new System.Drawing.Size(120, 41);
@@ -358,7 +360,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btn_close;
-            this.ClientSize = new System.Drawing.Size(684, 472);
+            this.ClientSize = new System.Drawing.Size(733, 470);
             this.Controls.Add(this.btn_convert_hwp);
             this.Controls.Add(this.btn_config);
             this.Controls.Add(this.btn_convert_hwpx);
@@ -391,7 +393,7 @@
         private System.Windows.Forms.ColumnHeader col_name;
         private System.Windows.Forms.ColumnHeader col_path;
         private System.Windows.Forms.ColumnHeader col_status;
-        private System.Windows.Forms.ColumnHeader col_fullpath;
+        private System.Windows.Forms.ColumnHeader col_size;
         private System.Windows.Forms.ListView list_file;
         private System.Windows.Forms.ImageList imageList_file;
         private System.Windows.Forms.Button btn_convert_pdf;
