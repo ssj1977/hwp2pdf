@@ -22,6 +22,7 @@ namespace hwp2pdf
         static string st_format = "PDF";
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
         int option_extflag = (1 | 2 | 4); //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
+        bool option_PDF_print = true;
         public FormMain()
         {
             InitializeComponent();
@@ -36,6 +37,8 @@ namespace hwp2pdf
             if (strTemp.Length > 0) option_overwrite = int.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "OptionExtFlag", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0) option_extflag = int.Parse(strTemp.ToString());
+            GetPrivateProfileString("Main", "OptionPDFPrint", "", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) option_PDF_print = bool.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "PrinterName", "", strTemp, strTemp.Capacity, ini_path);
             m_strPrinter = strTemp.ToString();
             GetPrivateProfileString("Main", "PrintMethod", "", strTemp, strTemp.Capacity, ini_path);
@@ -135,16 +138,22 @@ namespace hwp2pdf
             for (int i=0; i<printer_names.Count; i++)
             {
                 string name = printer_names[i].ToString();
-                if (name.Contains("PDF"))
+                if (name == m_strPrinter)
                 {
                     bPrinterInstalled = true;
+                    break;
+                }
+                else if (name.Contains("PDF"))
+                {
                     if (name.Contains("Hancom PDF"))
                     {
+                        bPrinterInstalled = true;
                         m_strPrinter = name;
                         break;  //한컴PDF가 있으면 기본 프린터로 사용
                     }
                     if (name.Contains("Microsoft Print to PDF"))
                     {
+                        bPrinterInstalled = true;
                         m_strPrinter = name; //한컴PDF가 없는 경우 MS PDF 사용
                     }
                 }
@@ -310,7 +319,7 @@ namespace hwp2pdf
                     else
                     {
                         bool bSuccess = false;
-                        if (st_format == "PDF" && m_strPrinter != "")
+                        if (st_format == "PDF" && option_PDF_print == true && m_strPrinter != "")
                         {
                             //PDF 파일의 경우 가상 프린터를 사용하는 방식으로 변환 가능
                             //인쇄 모아쓰기 설정을 변경할 수 있지만 인쇄 팝업이 잠시 떴다 사라짐
@@ -461,63 +470,6 @@ namespace hwp2pdf
                             newItem.SubItems.Add(GetFileSizeString(fInfo.Length)); // 크기
                             newItem.SubItems.Add(""); // 처리상태
                             nAdded++;
-                            /*HWP 파일의 모아찍기 상태를 확인한다. --> 속도가 느려지므로 나중에는 별도 실행 기능으로
-                            string etcinfo = "";
-                            if (file_ext.Equals(".HWP") || file_ext.Equals(".HWPX"))
-                            {
-                                AxHwpCtrl temp_hwp = axHwpCtrl1;
-                                string file_path = System.IO.Path.GetFullPath(file);
-                                string file_type = "";
-                                if (file_ext.Equals(".HWP")) file_type = "HWP";
-                                else if (file_ext.Equals(".HWPX")) file_type = "HWPX";
-                                if (temp_hwp.Open(file_path, file_type, "lock:false;forceopen:true")) //lock:false;forceopen:true;
-                                {
-                                    HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
-                                    HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
-                                    act.GetDefault(pset);
-                                    var print_method = pset.Item("PrintMethod");
-                                    switch (int.Parse(print_method.ToString()))
-                                    {
-                                        case 0:
-                                            etcinfo = ""; //"기본 인쇄";
-                                            break;
-                                        case 1:
-                                            etcinfo = ""; //"용지 맞춤";
-                                            break;
-                                        case 2:
-                                            etcinfo = ""; // "나눠 찍기";
-                                            break;
-                                        case 3:
-                                            etcinfo = "2쪽 모아찍기";
-                                            break;
-                                        case 4:
-                                            etcinfo = "3쪽 모아찍기";
-                                            break;
-                                        case 5:
-                                            etcinfo = "4쪽 모아찍기";
-                                            break;
-                                        case 6:
-                                            etcinfo = "4쪽 모아찍기";
-                                            break;
-                                        case 7:
-                                            etcinfo = "6쪽 모아찍기";
-                                            break;
-                                        case 8:
-                                            etcinfo = "8쪽 모아찍기";
-                                            break;
-                                        case 9:
-                                            etcinfo = "9쪽 모아찍기";
-                                            break;
-                                        case 10:
-                                            etcinfo = "16쪽 모아찍기";
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    temp_hwp.Clear();
-                                }
-                            }
-                            newItem.SubItems.Add(etcinfo);*/
                         }
                     }
                 }
@@ -561,6 +513,7 @@ namespace hwp2pdf
             WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
             WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path);
             WritePrivateProfileString("Main", "OptionExtFlag", option_extflag.ToString(), ini_path);
+            WritePrivateProfileString("Main", "OptionPDFPrint", option_PDF_print.ToString(), ini_path);
             WritePrivateProfileString("Main", "PrinterName", m_strPrinter, ini_path);
             WritePrivateProfileString("Main", "PrintMethod", m_nPrintMethod.ToString(), ini_path);
             String strTemp;
@@ -637,11 +590,14 @@ namespace hwp2pdf
         private void btn_config_Click(object sender, EventArgs e)
         {
             FormConfig dlg = new FormConfig();
-            dlg.setOption(option_overwrite, option_extflag);
+            dlg.setOption(option_overwrite, option_extflag, option_PDF_print, m_strPrinter, m_nPrintMethod);
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 option_overwrite = dlg.get_option_overwrite();
                 option_extflag = dlg.get_option_extflag();
+                option_PDF_print = dlg.get_option_PDF_print();
+                m_strPrinter = dlg.get_option_printer();
+                m_nPrintMethod = dlg.get_option_printmethod();
             }
         }
     }

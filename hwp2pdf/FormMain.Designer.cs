@@ -379,7 +379,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
-            this.Text = "hwp2pdf v1.4";
+            this.Text = "hwp2pdf v1.5";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
