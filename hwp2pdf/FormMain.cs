@@ -15,7 +15,7 @@ namespace hwp2pdf
     public partial class FormMain : Form
     {
         string m_strPrinter = ""; //PDF 변환용 가상 프린터 이름
-        int m_nPrintMethod = 0;
+        int m_nPrintMethod = 1;
         bool m_bUseCurrentPath = true;
         string m_strSavePath = "";
         static bool st_bConverting = false;
@@ -135,6 +135,8 @@ namespace hwp2pdf
             System.Collections.ArrayList printer_names 
                 = new System.Collections.ArrayList(System.Drawing.Printing.PrinterSettings.InstalledPrinters);
             bool bPrinterInstalled = false;
+            bool bSetDefault = false;
+            if (m_strPrinter == "") bSetDefault = true;
             for (int i=0; i<printer_names.Count; i++)
             {
                 string name = printer_names[i].ToString();
@@ -148,13 +150,17 @@ namespace hwp2pdf
                     if (name.Contains("Hancom PDF"))
                     {
                         bPrinterInstalled = true;
-                        m_strPrinter = name;
-                        break;  //한컴PDF가 있으면 기본 프린터로 사용
+                        if (bSetDefault == true)
+                        {   //프린터가 설정되지 않은 상태에서 한컴PDF가 있으면 기본 프린터로 사용 
+                            m_strPrinter = name;
+                            break;  
+                        }
                     }
                     if (name.Contains("Microsoft Print to PDF"))
                     {
                         bPrinterInstalled = true;
-                        m_strPrinter = name; //한컴PDF가 없는 경우 MS PDF 사용
+                        //프린터가 설정되지 않은 상태에서 한컴PDF가 없는 경우 MS PDF 사용
+                        if (bSetDefault == true) m_strPrinter = name; 
                     }
                 }
             }
@@ -216,6 +222,7 @@ namespace hwp2pdf
                 btn_close.Enabled = bEnable;
                 btn_convert_pdf.Enabled = true;
                 btn_convert_hwpx.Enabled = true;
+                btn_convert_hwp.Enabled = true;
                 if (bEnable)    btn_convert_pdf.Text = "PDF로 변환";
                 else            btn_convert_pdf.Text = "변환 중단";
                 if (bEnable)    btn_convert_hwpx.Text = "HWPX로 변환";
@@ -260,6 +267,7 @@ namespace hwp2pdf
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
             foreach (string file_path in paths)
             {
+                temp_hwp.SetMessageBoxMode(0x00224421);
                 string file_ext = System.IO.Path.GetExtension(file_path).ToUpper();
                 string file_type = "";
                 if (file_ext.Equals(".HWP")) file_type = "HWP";
@@ -327,15 +335,33 @@ namespace hwp2pdf
                             HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
                             HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
                             act.GetDefault(pset);
-                            pset.SetItem("PrintMethod", m_nPrintMethod);
+                            pset.SetItem("PrintMethod", m_nPrintMethod); //인쇄방식
+                            pset.SetItem("Collate", 1);
+                            pset.SetItem("NumCopy", 1);
+                            pset.SetItem("UserOrder", 0);
                             pset.SetItem("PrintToFile", 1);
-                            pset.SetItem("FileName", save_path);
-                            pset.SetItem("Device", 3);
-                            pset.SetItem("PrinterName", m_strPrinter);
+                            pset.SetItem("Range", 0);
+                            pset.SetItem("FileName", save_path); // 경로
+                            pset.SetItem("PrinterName", m_strPrinter); //프린터
+                            pset.SetItem("UsingPagenum", 1);
+                            pset.SetItem("ReverseOrder", 0);
+                            pset.SetItem("Pause", 0);
+                            pset.SetItem("PrintImage", 1);
+                            pset.SetItem("PrintDrawObj", 1);
+                            pset.SetItem("PrintClickHere ", 0);
+                            pset.SetItem("PrintFormObj", 1);
+                            pset.SetItem("PrintMarkPen", 0);
+                            pset.SetItem("PrintMemo", 0);
+                            pset.SetItem("PrintMemoContents", 0);
+                            pset.SetItem("PrintRevision", 1);
+                            pset.SetItem("PrintBarcode", 1);
                             pset.SetItem("Flags", 8192);
+                            pset.SetItem("Device", 3);
+                            pset.SetItem("PrintPronounce", 0);
                             if (act.Execute(pset) == 1)
                             {
                                 bSuccess = true;
+                                Thread.Sleep(1000); //기다리지 않으면 가끔 '다른이름으로 저장' 창이 뜸
                             }
                         }
                         else
@@ -352,9 +378,9 @@ namespace hwp2pdf
                         }
                         else show_convert_state(nRow, "변환 시도 실패");
                     }
+                    temp_hwp.Clear(1);
                 }
                 else show_convert_state(nRow, "원본파일 열기 실패");
-                temp_hwp.Clear();
                 nRow++;
                 if (st_bConverting == false)
                 {

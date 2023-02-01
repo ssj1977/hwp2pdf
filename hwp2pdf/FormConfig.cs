@@ -15,7 +15,7 @@ namespace hwp2pdf
         int m_option_extflag = 0; //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
         bool m_option_PDF_print = true;
         string m_strPrinter = "";
-        int m_nPrintMethod = 0; 
+        int m_nPrintMethod = 1; 
 
         public FormConfig()
         {
@@ -69,7 +69,7 @@ namespace hwp2pdf
             int nTemp = comboBox_PDF_PrintMethod.SelectedIndex;
             if (nTemp == 0)
             {
-                m_nPrintMethod = 0;
+                m_nPrintMethod = 1;
             }
             else if (nTemp > 0)
             {   // 1 = 용지맞춤, 2 = 나눠찍기, 3 = 자동 모아찍기 설정은 무시
@@ -118,7 +118,7 @@ namespace hwp2pdf
                 comboBox_PDF_Printer.SelectedIndex = 0;
 
             //모아찍기 설정값 선택
-            if (m_nPrintMethod == 0)
+            if (m_nPrintMethod == 1)
             {
                 comboBox_PDF_PrintMethod.SelectedIndex = 0;
             }

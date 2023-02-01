@@ -45,12 +45,12 @@ namespace hwp2pdf
             this.cb_hwpx = new System.Windows.Forms.CheckBox();
             this.cb_hwp = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.radio_PDF_SaveAs = new System.Windows.Forms.RadioButton();
-            this.radio_PDF_Print = new System.Windows.Forms.RadioButton();
-            this.comboBox_PDF_Printer = new System.Windows.Forms.ComboBox();
-            this.label_PDF_Printer = new System.Windows.Forms.Label();
             this.label_PDF_PrintMethod = new System.Windows.Forms.Label();
             this.comboBox_PDF_PrintMethod = new System.Windows.Forms.ComboBox();
+            this.label_PDF_Printer = new System.Windows.Forms.Label();
+            this.comboBox_PDF_Printer = new System.Windows.Forms.ComboBox();
+            this.radio_PDF_Print = new System.Windows.Forms.RadioButton();
+            this.radio_PDF_SaveAs = new System.Windows.Forms.RadioButton();
             this.groupBox_overwrite_option.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -230,52 +230,6 @@ namespace hwp2pdf
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "PDF 변환 방법";
             // 
-            // radio_PDF_SaveAs
-            // 
-            this.radio_PDF_SaveAs.AutoSize = true;
-            this.radio_PDF_SaveAs.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.radio_PDF_SaveAs.Location = new System.Drawing.Point(18, 38);
-            this.radio_PDF_SaveAs.Name = "radio_PDF_SaveAs";
-            this.radio_PDF_SaveAs.Size = new System.Drawing.Size(407, 25);
-            this.radio_PDF_SaveAs.TabIndex = 0;
-            this.radio_PDF_SaveAs.TabStop = true;
-            this.radio_PDF_SaveAs.Text = "기본 변환 방식 - 모아찍기 설정을 바꿀 수 없습니다.";
-            this.radio_PDF_SaveAs.UseVisualStyleBackColor = true;
-            this.radio_PDF_SaveAs.CheckedChanged += new System.EventHandler(this.radio_PDF_SaveAs_CheckedChanged);
-            // 
-            // radio_PDF_Print
-            // 
-            this.radio_PDF_Print.AutoSize = true;
-            this.radio_PDF_Print.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.radio_PDF_Print.Location = new System.Drawing.Point(18, 75);
-            this.radio_PDF_Print.Name = "radio_PDF_Print";
-            this.radio_PDF_Print.Size = new System.Drawing.Size(407, 25);
-            this.radio_PDF_Print.TabIndex = 1;
-            this.radio_PDF_Print.TabStop = true;
-            this.radio_PDF_Print.Text = "가상 인쇄 방식 - 모아찍기 설정을 바꿀 수 있습니다.";
-            this.radio_PDF_Print.UseVisualStyleBackColor = true;
-            this.radio_PDF_Print.CheckedChanged += new System.EventHandler(this.radio_PDF_Print_CheckedChanged);
-            // 
-            // comboBox_PDF_Printer
-            // 
-            this.comboBox_PDF_Printer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox_PDF_Printer.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.comboBox_PDF_Printer.FormattingEnabled = true;
-            this.comboBox_PDF_Printer.Location = new System.Drawing.Point(157, 105);
-            this.comboBox_PDF_Printer.Name = "comboBox_PDF_Printer";
-            this.comboBox_PDF_Printer.Size = new System.Drawing.Size(301, 29);
-            this.comboBox_PDF_Printer.TabIndex = 2;
-            // 
-            // label_PDF_Printer
-            // 
-            this.label_PDF_Printer.AutoSize = true;
-            this.label_PDF_Printer.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.label_PDF_Printer.Location = new System.Drawing.Point(39, 108);
-            this.label_PDF_Printer.Name = "label_PDF_Printer";
-            this.label_PDF_Printer.Size = new System.Drawing.Size(112, 21);
-            this.label_PDF_Printer.TabIndex = 3;
-            this.label_PDF_Printer.Text = "사용할 프린터";
-            // 
             // label_PDF_PrintMethod
             // 
             this.label_PDF_PrintMethod.AutoSize = true;
@@ -292,7 +246,7 @@ namespace hwp2pdf
             this.comboBox_PDF_PrintMethod.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.comboBox_PDF_PrintMethod.FormattingEnabled = true;
             this.comboBox_PDF_PrintMethod.Items.AddRange(new object[] {
-            "기본 인쇄",
+            "모아찍기 안함",
             "2장 모아찍기",
             "3장 모아찍기",
             "4장 모아찍기",
@@ -304,6 +258,52 @@ namespace hwp2pdf
             this.comboBox_PDF_PrintMethod.Name = "comboBox_PDF_PrintMethod";
             this.comboBox_PDF_PrintMethod.Size = new System.Drawing.Size(301, 29);
             this.comboBox_PDF_PrintMethod.TabIndex = 4;
+            // 
+            // label_PDF_Printer
+            // 
+            this.label_PDF_Printer.AutoSize = true;
+            this.label_PDF_Printer.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label_PDF_Printer.Location = new System.Drawing.Point(39, 108);
+            this.label_PDF_Printer.Name = "label_PDF_Printer";
+            this.label_PDF_Printer.Size = new System.Drawing.Size(112, 21);
+            this.label_PDF_Printer.TabIndex = 3;
+            this.label_PDF_Printer.Text = "사용할 프린터";
+            // 
+            // comboBox_PDF_Printer
+            // 
+            this.comboBox_PDF_Printer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox_PDF_Printer.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.comboBox_PDF_Printer.FormattingEnabled = true;
+            this.comboBox_PDF_Printer.Location = new System.Drawing.Point(157, 105);
+            this.comboBox_PDF_Printer.Name = "comboBox_PDF_Printer";
+            this.comboBox_PDF_Printer.Size = new System.Drawing.Size(301, 29);
+            this.comboBox_PDF_Printer.TabIndex = 2;
+            // 
+            // radio_PDF_Print
+            // 
+            this.radio_PDF_Print.AutoSize = true;
+            this.radio_PDF_Print.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.radio_PDF_Print.Location = new System.Drawing.Point(18, 75);
+            this.radio_PDF_Print.Name = "radio_PDF_Print";
+            this.radio_PDF_Print.Size = new System.Drawing.Size(407, 25);
+            this.radio_PDF_Print.TabIndex = 1;
+            this.radio_PDF_Print.TabStop = true;
+            this.radio_PDF_Print.Text = "가상 인쇄 방식 - 모아찍기 설정을 바꿀 수 있습니다.";
+            this.radio_PDF_Print.UseVisualStyleBackColor = true;
+            this.radio_PDF_Print.CheckedChanged += new System.EventHandler(this.radio_PDF_Print_CheckedChanged);
+            // 
+            // radio_PDF_SaveAs
+            // 
+            this.radio_PDF_SaveAs.AutoSize = true;
+            this.radio_PDF_SaveAs.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.radio_PDF_SaveAs.Location = new System.Drawing.Point(18, 38);
+            this.radio_PDF_SaveAs.Name = "radio_PDF_SaveAs";
+            this.radio_PDF_SaveAs.Size = new System.Drawing.Size(407, 25);
+            this.radio_PDF_SaveAs.TabIndex = 0;
+            this.radio_PDF_SaveAs.TabStop = true;
+            this.radio_PDF_SaveAs.Text = "기본 변환 방식 - 모아찍기 설정을 바꿀 수 없습니다.";
+            this.radio_PDF_SaveAs.UseVisualStyleBackColor = true;
+            this.radio_PDF_SaveAs.CheckedChanged += new System.EventHandler(this.radio_PDF_SaveAs_CheckedChanged);
             // 
             // FormConfig
             // 
