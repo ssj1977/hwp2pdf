@@ -51,14 +51,12 @@
             this.text_log = new System.Windows.Forms.TextBox();
             this.btn_close = new System.Windows.Forms.Button();
             this.text_title = new System.Windows.Forms.TextBox();
-            this.axHwpCtrl1 = new AxHWPCONTROLLib.AxHwpCtrl();
             this.btnSavePath = new System.Windows.Forms.Button();
             this.textSavePath = new System.Windows.Forms.TextBox();
             this.btn_convert_hwpx = new System.Windows.Forms.Button();
             this.btn_config = new System.Windows.Forms.Button();
             this.btn_convert_hwp = new System.Windows.Forms.Button();
             this.contextMenu_list.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).BeginInit();
             this.SuspendLayout();
             // 
             // col_name
@@ -280,17 +278,6 @@
     " 변환할 수 있습니다.\r\n파일을 끌어서 놓기나 우클릭 메뉴로 추가하고 변환 버튼을 클릭해 주세요.";
             this.text_title.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
-            // axHwpCtrl1
-            // 
-            this.axHwpCtrl1.Enabled = true;
-            this.axHwpCtrl1.Location = new System.Drawing.Point(599, 304);
-            this.axHwpCtrl1.Name = "axHwpCtrl1";
-            this.axHwpCtrl1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axHwpCtrl1.OcxState")));
-            this.axHwpCtrl1.Size = new System.Drawing.Size(120, 70);
-            this.axHwpCtrl1.TabIndex = 9;
-            this.axHwpCtrl1.TabStop = false;
-            this.axHwpCtrl1.Visible = false;
-            // 
             // btnSavePath
             // 
             this.btnSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -366,7 +353,6 @@
             this.Controls.Add(this.btn_convert_hwpx);
             this.Controls.Add(this.textSavePath);
             this.Controls.Add(this.btnSavePath);
-            this.Controls.Add(this.axHwpCtrl1);
             this.Controls.Add(this.text_title);
             this.Controls.Add(this.btn_close);
             this.Controls.Add(this.text_log);
@@ -383,7 +369,6 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.axHwpCtrl1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -401,7 +386,6 @@
         private System.Windows.Forms.TextBox text_log;
         private System.Windows.Forms.Button btn_close;
         private System.Windows.Forms.TextBox text_title;
-        private AxHWPCONTROLLib.AxHwpCtrl axHwpCtrl1;
         private System.Windows.Forms.Button btnSavePath;
         private System.Windows.Forms.TextBox textSavePath;
         private System.Windows.Forms.ContextMenuStrip contextMenu_list;

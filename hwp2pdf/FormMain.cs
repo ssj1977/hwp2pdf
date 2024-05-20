@@ -7,8 +7,7 @@ using System.Threading;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using AxHWPCONTROLLib;
-
+using HwpObjectLib;
 
 namespace hwp2pdf
 {
@@ -169,10 +168,10 @@ namespace hwp2pdf
                 MessageBox.Show("한컴 PDF 또는 Micosoft Print to PDF가 설치되어 있지 않습니다.");
             }
 
-            if (axHwpCtrl1.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample"))
-                add_log("파일 접근권한 획득에 성공하였습니다.");
-            else
-                add_log("파일 접근권한 획득에 실패했습니다. 경고창이 뜨면 [모두 허용]을 클릭하세요.");
+//            if (axHwpCtrl1.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample"))
+//                add_log("파일 접근권한 획득에 성공하였습니다.");
+//            else
+//               add_log("파일 접근권한 획득에 실패했습니다. 경고창이 뜨면 [모두 허용]을 클릭하세요.");
 
             if (m_bUseCurrentPath == true) m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
@@ -258,10 +257,17 @@ namespace hwp2pdf
         }
         private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
         {
-            //AxHwpCtrl temp_hwp = new AxHwpCtrl();
-            //temp_hwp.CreateControl();
-            //bool bReg = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
-            AxHwpCtrl temp_hwp = axHwpCtrl1;
+            HwpObject temp_hwp = new HwpObject();
+            temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModule");
+            temp_hwp.XHwpWindows.Register(false, true);
+            temp_hwp.XHwpDocuments.
+            //dynamic temp_hwp = null;
+            //Type hwpType = Type.GetTypeFromProgID("HWPFrame.HwpObject");
+            temp_hwp = Activator.CreateInstance(hwpType);
+            // 한글 창을 보이도록 설정
+            temp_hwp.XHwpWindows.Item(0).Visible = false;
+            // 새로운 한글 문서 생성
+            temp_hwp.Create("FileNew");
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
@@ -388,6 +394,7 @@ namespace hwp2pdf
                     break;
                 }
             }
+            temp_hwp.Quit();
             add_log(String.Format("{0}개 파일 중 {1}개 파일을 변환하였습니다.", paths.Length, nConverted));
             st_bConverting = false;
             enable_controls(true);
