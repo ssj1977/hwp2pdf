@@ -258,16 +258,7 @@ namespace hwp2pdf
         private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
         {
             HwpObject temp_hwp = new HwpObject();
-            temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModule");
-            temp_hwp.XHwpWindows.Register(false, true);
-            temp_hwp.XHwpDocuments.
-            //dynamic temp_hwp = null;
-            //Type hwpType = Type.GetTypeFromProgID("HWPFrame.HwpObject");
-            temp_hwp = Activator.CreateInstance(hwpType);
-            // 한글 창을 보이도록 설정
-            temp_hwp.XHwpWindows.Item(0).Visible = false;
-            // 새로운 한글 문서 생성
-            temp_hwp.Create("FileNew");
+            temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
@@ -338,9 +329,7 @@ namespace hwp2pdf
                             //PDF 파일의 경우 가상 프린터를 사용하는 방식으로 변환 가능
                             //인쇄 모아쓰기 설정을 변경할 수 있지만 인쇄 팝업이 잠시 떴다 사라짐
                             //가상 프린터를 쓰지 않는 경우는 기존의 SaveAS 방식으로 변환
-                            HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
-                            HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
-                            act.GetDefault(pset);
+                            /*temp_hwp.HAction.GetDefault("Print", temp_hwp.HParameterSet.HFileOpenSave.HSet);
                             pset.SetItem("PrintMethod", m_nPrintMethod); //인쇄방식
                             pset.SetItem("Collate", 1);
                             pset.SetItem("NumCopy", 1);
@@ -368,7 +357,7 @@ namespace hwp2pdf
                             {
                                 bSuccess = true;
                                 Thread.Sleep(1000); //기다리지 않으면 가끔 '다른이름으로 저장' 창이 뜸
-                            }
+                            }*/
                         }
                         else
                         {
