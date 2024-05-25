@@ -23,8 +23,15 @@ namespace hwp2pdf
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
         int option_extflag = (1 | 2 | 4); //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
         bool option_PDF_print = true;
+        HwpObject hwp_object = new HwpObject(); //한컴 오토메이션을 위한 기본 인터페이스
+        bool filecheckdll_ok = false;
         public FormMain()
         {
+            if (hwp_object == null)
+            {
+                MessageBox.Show("한글 오토메이션을 시작하지 못했습니다.");
+                return;
+            }
             InitializeComponent();
             //ini 파일에서 정보 불러오기
             String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
@@ -68,7 +75,7 @@ namespace hwp2pdf
             }
 
             // FilePathCheckerModuleExample.DLL이 있어야 한컴오토메이션이 파일에 바로 접근 가능
-            // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpCtrl\Modules"에 
+            // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpAutomation\Modules"에 
             // FilePathCheckerModuleExample 값으로 DLL의 위치가 등록되어 있어야 함
             //레지스트리에 보안모듈 추가
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
@@ -127,6 +134,11 @@ namespace hwp2pdf
                     add_log("실행파일과 같은 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
                 }
             }
+            filecheckdll_ok = hwp_object.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
+            if (filecheckdll_ok == false)
+            {
+                add_log("FilePathCheckerModuleExample.DLL 연결에 실패했습니다.");
+            }
             // PDF 변환용 프린터가 설치되어 있는지 확인
             System.Collections.ArrayList printer_names 
                 = new System.Collections.ArrayList(System.Drawing.Printing.PrinterSettings.InstalledPrinters);
@@ -164,12 +176,6 @@ namespace hwp2pdf
             {
                 MessageBox.Show("한컴 PDF 또는 Micosoft Print to PDF가 설치되어 있지 않습니다.");
             }
-
-//            if (axHwpCtrl1.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample"))
-//                add_log("파일 접근권한 획득에 성공하였습니다.");
-//            else
-//               add_log("파일 접근권한 획득에 실패했습니다. 경고창이 뜨면 [모두 허용]을 클릭하세요.");
-
             if (m_bUseCurrentPath == true) m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
         }
@@ -254,21 +260,18 @@ namespace hwp2pdf
         }
         private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
         {
-            HwpObject temp_hwp = new HwpObject();
-            var ss = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
-            if (ss == false)
+            if (filecheckdll_ok == false)
             {
-                return;
+                IXHwpWindows hwp_windows = (IXHwpWindows)hwp_object.XHwpWindows;
+                IXHwpWindow hwp_window = (IXHwpWindow)hwp_windows.Item[0];
+                hwp_window.Visible = filecheckdll_ok;
             }
-            IXHwpWindows hwp_windows = (IXHwpWindows)temp_hwp.XHwpWindows;
-            IXHwpWindow hwp_window = (IXHwpWindow)hwp_windows.Item[0];
-            hwp_window.Visible = true;
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
             foreach (string file_path in paths)
             {
-                temp_hwp.SetMessageBoxMode(0x00224421);
+                if (filecheckdll_ok == true) hwp_object.SetMessageBoxMode(0x00224421);
                 string file_ext = System.IO.Path.GetExtension(file_path).ToUpper();
                 string file_type = "";
                 if (file_ext.Equals(".HWP")) file_type = "HWP";
@@ -282,7 +285,7 @@ namespace hwp2pdf
                 {
                     show_convert_state(nRow, "변환안함(같은형식)");
                 }
-                else if (temp_hwp.Open(file_path, file_type, "lock:false;forceopen:true;")) //
+                else if (hwp_object.Open(file_path, file_type, "lock:false;forceopen:true;")) //
                 {
                     show_convert_state(nRow, "변환중");
                     string save_path = "";
@@ -330,43 +333,49 @@ namespace hwp2pdf
                         bool bSuccess = false;
                         if (st_format == "PDF" && option_PDF_print == true && m_strPrinter != "")
                         {
+                            //HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
+                            //HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
                             //PDF 파일의 경우 가상 프린터를 사용하는 방식으로 변환 가능
                             //인쇄 모아쓰기 설정을 변경할 수 있지만 인쇄 팝업이 잠시 떴다 사라짐
                             //가상 프린터를 쓰지 않는 경우는 기존의 SaveAS 방식으로 변환
-                            /*temp_hwp.HAction.GetDefault("Print", temp_hwp.HParameterSet.HFileOpenSave.HSet);
-                            pset.SetItem("PrintMethod", m_nPrintMethod); //인쇄방식
-                            pset.SetItem("Collate", 1);
-                            pset.SetItem("NumCopy", 1);
-                            pset.SetItem("UserOrder", 0);
-                            pset.SetItem("PrintToFile", 1);
-                            pset.SetItem("Range", 0);
-                            pset.SetItem("FileName", save_path); // 경로
-                            pset.SetItem("PrinterName", m_strPrinter); //프린터
-                            pset.SetItem("UsingPagenum", 1);
-                            pset.SetItem("ReverseOrder", 0);
-                            pset.SetItem("Pause", 0);
-                            pset.SetItem("PrintImage", 1);
-                            pset.SetItem("PrintDrawObj", 1);
-                            pset.SetItem("PrintClickHere ", 0);
-                            pset.SetItem("PrintFormObj", 1);
-                            pset.SetItem("PrintMarkPen", 0);
-                            pset.SetItem("PrintMemo", 0);
-                            pset.SetItem("PrintMemoContents", 0);
-                            pset.SetItem("PrintRevision", 1);
-                            pset.SetItem("PrintBarcode", 1);
-                            pset.SetItem("Flags", 8192);
-                            pset.SetItem("Device", 3);
-                            pset.SetItem("PrintPronounce", 0);
-                            if (act.Execute(pset) == 1)
+                            HAction hwp_action = (HAction)hwp_object.HAction;
+                            HParameterSet hwp_pset = (HParameterSet)hwp_object.HParameterSet;
+                            HPrint hwp_print = (HPrint)hwp_pset.HPrint;
+                            HSet hwp_set = (HSet)hwp_print.HSet;
+                            hwp_action.GetDefault("Print", hwp_set);
+                            hwp_print.PrintMethod = (ushort)m_nPrintMethod;
+                            hwp_print.Collate = 1;
+                            hwp_print.NumCopy = 1;
+                            hwp_print.UserOrder = 0;
+                            hwp_print.PrintToFile = 1;
+                            hwp_print.Range = 0;
+                            hwp_print.filename = save_path;
+                            hwp_print.PrinterName = m_strPrinter;
+                            hwp_print.UsingPagenum = 1;
+                            hwp_print.ReverseOrder = 0;
+                            hwp_print.Pause = 0;
+                            hwp_print.PrintImage = 1;
+                            hwp_print.PrintDrawObj = 1;
+                            hwp_print.PrintClickHere = 0;
+                            hwp_print.PrintFormObj = 1;
+                            hwp_print.PrintMarkPen = 0;
+                            hwp_print.PrintMemo = 0;
+                            hwp_print.PrintMemoContents = 0;
+                            hwp_print.PrintRevision = 1;
+                            hwp_print.PrintBarcode = 1;
+                            hwp_print.Flags = 8192;
+                            hwp_print.Device = 3;
+                            hwp_print.PrintPronounce = 0;
+                            if (hwp_action.Execute("Print", hwp_set) == true)
                             {
                                 bSuccess = true;
                                 Thread.Sleep(1000); //기다리지 않으면 가끔 '다른이름으로 저장' 창이 뜸
-                            }*/
+                            }
                         }
                         else
                         {
                             //SaveAs의 경우 PDF 변환시 HWP파일의 모아찍기 설정은 그대로 유지됨
-                            bSuccess = temp_hwp.SaveAs(save_path, st_format, "");
+                            bSuccess = hwp_object.SaveAs(save_path, st_format, "");
                         }
                         if (bSuccess)
                         {
@@ -377,7 +386,7 @@ namespace hwp2pdf
                         }
                         else show_convert_state(nRow, "변환 시도 실패");
                     }
-                    temp_hwp.Clear(1);
+                    hwp_object.Clear(1);
                 }
                 else show_convert_state(nRow, "원본파일 열기 실패");
                 nRow++;
@@ -387,7 +396,6 @@ namespace hwp2pdf
                     break;
                 }
             }
-            temp_hwp.Quit();
             add_log(String.Format("{0}개 파일 중 {1}개 파일을 변환하였습니다.", paths.Length, nConverted));
             st_bConverting = false;
             enable_controls(true);
@@ -533,6 +541,7 @@ namespace hwp2pdf
         }
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (hwp_object != null) hwp_object.Quit();
             String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
             WritePrivateProfileString("Main", "SaveToCurrentPath", m_bUseCurrentPath.ToString(), ini_path);
             if (m_bUseCurrentPath == true) m_strSavePath = "";
