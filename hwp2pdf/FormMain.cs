@@ -8,6 +8,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using HwpObjectLib;
+using System.Reflection;
 
 namespace hwp2pdf
 {
@@ -66,69 +67,65 @@ namespace hwp2pdf
                 }
             }
 
-            // FilePathCheckerModuleExample.DLL이 있어야 OCX컨트롤이 파일에 바로 접근 가능
+            // FilePathCheckerModuleExample.DLL이 있어야 한컴오토메이션이 파일에 바로 접근 가능
             // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpCtrl\Modules"에 
             // FilePathCheckerModuleExample 값으로 DLL의 위치가 등록되어 있어야 함
+            //레지스트리에 보안모듈 추가
             RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
             if (reg == null)
             {
                 MessageBox.Show("한컴오피스 한글2010 이상 버전이 설치되어 있지 않습니다.");
                 return;
             }
-            reg = reg.CreateSubKey("HwpCtrl");
+            reg = reg.CreateSubKey("HwpAutomation");
             if (reg == null)
             {
-                MessageBox.Show("레지스트리 항목(HwpCtrl) 추가 중 오류가 발생했습니다.");
+                MessageBox.Show("레지스트리 항목(HwpAutomation) 추가 중 오류가 발생했습니다.");
                 return;
+            }
+            reg = reg.CreateSubKey("Modules");
+            if (reg == null)
+            {
+                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다.");
+                return;
+            }
+            Object temp = reg.GetValue("FilePathCheckerModuleExample");
+            bool bRegisterCurrentPath = false;
+            // 먼저 레지스트리 값이 있는지 확인하고
+            if (temp == null)
+            {
+                add_log("레지스트리에 FilePathCheckerModuleExample.DLL이 등록되어 있지 않습니다.");
+                //레지스트리 값이 없다면 현재 실행경로에 DLL이 있는지 찾아서 등록 시도
+                bRegisterCurrentPath = true;
             }
             else
             {
-                reg = reg.CreateSubKey("Modules");
-            }
-            if (reg != null)
-            {
-                Object temp = reg.GetValue("FilePathCheckerModuleExample");
-                bool bRegisterCurrentPath = false;
-                // 먼저 레지스트리 값이 있는지 확인하고
-                if (temp == null)
+                //레지스트리 값이 있는 경우 지정된 위치에 DLL이 존재하는지 확인
+                String dll_path = temp.ToString();
+                FileInfo file_info = new FileInfo(dll_path);
+                //파일이 없다면 실행파일과 같은 경로에 DLL이 있는지 재확인
+                if (file_info.Exists == false)
                 {
-                    add_log("레지스트리에 FilePathCheckerModuleExample.DLL이 등록되어 있지 않습니다.");
-                    //레지스트리 값이 없다면 현재 실행경로에 DLL이 있는지 찾아서 등록 시도
+                    add_log("레지스트리에 지정된 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
                     bRegisterCurrentPath = true;
+                }
+            }
+            if (bRegisterCurrentPath)
+            {
+                // 레지스트리 값이 없거나 지정된 위치에 DLL 파일이 없는 경우, 현재 실행파일과 같은 경로에 DLL이 있는지 확인
+                String dll_path = System.Windows.Forms.Application.StartupPath;
+                dll_path += "\\" + "FilePathCheckerModuleExample.DLL";
+                FileInfo file_info = new FileInfo(dll_path);
+                // 있다면 레지스트리에 값을 추가
+                if (file_info.Exists)
+                {
+                    add_log("실행파일과 같은 경로의 FilePathCheckerModuleExample.DLL을 등록합니다.");
+                    reg.SetValue("FilePathCheckerModuleExample", dll_path);
                 }
                 else
                 {
-                    //레지스트리 값이 있는 경우 지정된 위치에 DLL이 존재하는지 확인
-                    String dll_path = temp.ToString();
-                    FileInfo file_info = new FileInfo(dll_path);
-                    //파일이 없다면 실행파일과 같은 경로에 DLL이 있는지 재확인
-                    if (file_info.Exists == false)
-                    {
-                        add_log("레지스트리에 지정된 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
-                        bRegisterCurrentPath = true;
-                    }
+                    add_log("실행파일과 같은 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
                 }
-                if (bRegisterCurrentPath)
-                {
-                    // 레지스트리 값이 없거나 지정된 위치에 DLL 파일이 없는 경우, 현재 실행파일과 같은 경로에 DLL이 있는지 확인
-                    String dll_path = System.Windows.Forms.Application.StartupPath;
-                    dll_path += "\\" + "FilePathCheckerModuleExample.DLL";
-                    FileInfo file_info = new FileInfo(dll_path);
-                    // 있다면 레지스트리에 값을 추가
-                    if (file_info.Exists)
-                    {
-                        add_log("실행파일과 같은 경로의 FilePathCheckerModuleExample.DLL을 등록합니다.");
-                        reg.SetValue("FilePathCheckerModuleExample", dll_path);
-                    }
-                    else
-                    {
-                        add_log("실행파일과 같은 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다.");
             }
             // PDF 변환용 프린터가 설치되어 있는지 확인
             System.Collections.ArrayList printer_names 
@@ -258,7 +255,14 @@ namespace hwp2pdf
         private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
         {
             HwpObject temp_hwp = new HwpObject();
-            temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
+            var ss = temp_hwp.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
+            if (ss == false)
+            {
+                return;
+            }
+            IXHwpWindows hwp_windows = (IXHwpWindows)temp_hwp.XHwpWindows;
+            IXHwpWindow hwp_window = (IXHwpWindow)hwp_windows.Item[0];
+            hwp_window.Visible = true;
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");

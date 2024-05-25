@@ -171,26 +171,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="HWPCONTROLLib">
-      <Guid>{86E6E883-3879-4514-A25B-81023981DA19}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>2</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="HwpObjectLib">
-      <Guid>{7D2B6F3C-1D95-4E0C-BF5A-5EE564186FBC}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="hwp2pdf.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +182,17 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="HwpObjectLib">
+      <Guid>{7D2B6F3C-1D95-4E0C-BF5A-5EE564186FBC}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
