@@ -285,7 +285,7 @@ namespace hwp2pdf
                 {
                     show_convert_state(nRow, "변환안함(같은형식)");
                 }
-                else if (hwp_object.Open(file_path, file_type, "lock:false;forceopen:true;")) //
+                else if (hwp_object.Open(file_path, "", "lock:false;forceopen:true;")) //포맷을 지정하지 않으면 자동 인식
                 {
                     show_convert_state(nRow, "변환중");
                     string save_path = "";
