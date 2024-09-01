@@ -40,22 +40,20 @@
             this.list_menu_delete = new System.Windows.Forms.ToolStripMenuItem();
             this.list_menu_clear = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.list_menu_convert_pdf = new System.Windows.Forms.ToolStripMenuItem();
-            this.list_menu_convert_hwp = new System.Windows.Forms.ToolStripMenuItem();
-            this.list_menu_convert_hwpx = new System.Windows.Forms.ToolStripMenuItem();
+            this.list_menu_convert = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.list_menu_exit = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList_file = new System.Windows.Forms.ImageList(this.components);
-            this.btn_convert_pdf = new System.Windows.Forms.Button();
+            this.btn_convert = new System.Windows.Forms.Button();
             this.btn_clear = new System.Windows.Forms.Button();
             this.text_log = new System.Windows.Forms.TextBox();
             this.btn_close = new System.Windows.Forms.Button();
             this.text_title = new System.Windows.Forms.TextBox();
             this.btnSavePath = new System.Windows.Forms.Button();
             this.textSavePath = new System.Windows.Forms.TextBox();
-            this.btn_convert_hwpx = new System.Windows.Forms.Button();
             this.btn_config = new System.Windows.Forms.Button();
-            this.btn_convert_hwp = new System.Windows.Forms.Button();
+            this.combo_target_format = new System.Windows.Forms.ComboBox();
+            this.label_format = new System.Windows.Forms.Label();
             this.contextMenu_list.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -121,13 +119,11 @@
             this.list_menu_delete,
             this.list_menu_clear,
             this.toolStripSeparator1,
-            this.list_menu_convert_pdf,
-            this.list_menu_convert_hwp,
-            this.list_menu_convert_hwpx,
+            this.list_menu_convert,
             this.toolStripSeparator2,
             this.list_menu_exit});
             this.contextMenu_list.Name = "contextMenu_list";
-            this.contextMenu_list.Size = new System.Drawing.Size(197, 170);
+            this.contextMenu_list.Size = new System.Drawing.Size(197, 148);
             this.contextMenu_list.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_list_Opening);
             // 
             // list_menu_add
@@ -159,29 +155,13 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
             // 
-            // list_menu_convert_pdf
+            // list_menu_convert
             // 
-            this.list_menu_convert_pdf.Name = "list_menu_convert_pdf";
-            this.list_menu_convert_pdf.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.list_menu_convert_pdf.Size = new System.Drawing.Size(196, 22);
-            this.list_menu_convert_pdf.Text = "PDF로 변환";
-            this.list_menu_convert_pdf.Click += new System.EventHandler(this.list_menu_convert_pdf_Click);
-            // 
-            // list_menu_convert_hwp
-            // 
-            this.list_menu_convert_hwp.Name = "list_menu_convert_hwp";
-            this.list_menu_convert_hwp.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.list_menu_convert_hwp.Size = new System.Drawing.Size(196, 22);
-            this.list_menu_convert_hwp.Text = "HWPX로 변환";
-            this.list_menu_convert_hwp.Click += new System.EventHandler(this.list_menu_convert_hwpx_Click);
-            // 
-            // list_menu_convert_hwpx
-            // 
-            this.list_menu_convert_hwpx.Name = "list_menu_convert_hwpx";
-            this.list_menu_convert_hwpx.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.list_menu_convert_hwpx.Size = new System.Drawing.Size(196, 22);
-            this.list_menu_convert_hwpx.Text = "HWP로 변환";
-            this.list_menu_convert_hwpx.Click += new System.EventHandler(this.list_menu_convert_hwp_Click);
+            this.list_menu_convert.Name = "list_menu_convert";
+            this.list_menu_convert.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.list_menu_convert.Size = new System.Drawing.Size(196, 22);
+            this.list_menu_convert.Text = "변환 시작/중단";
+            this.list_menu_convert.Click += new System.EventHandler(this.list_menu_convert_Click);
             // 
             // toolStripSeparator2
             // 
@@ -202,24 +182,24 @@
             this.imageList_file.ImageSize = new System.Drawing.Size(16, 16);
             this.imageList_file.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // btn_convert_pdf
+            // btn_convert
             // 
-            this.btn_convert_pdf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_convert_pdf.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert_pdf.Location = new System.Drawing.Point(599, 118);
-            this.btn_convert_pdf.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btn_convert_pdf.Name = "btn_convert_pdf";
-            this.btn_convert_pdf.Size = new System.Drawing.Size(120, 41);
-            this.btn_convert_pdf.TabIndex = 2;
-            this.btn_convert_pdf.Text = "PDF로 변환";
-            this.btn_convert_pdf.UseVisualStyleBackColor = true;
-            this.btn_convert_pdf.Click += new System.EventHandler(this.btn_convert_pdf_Click);
+            this.btn_convert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_convert.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btn_convert.Location = new System.Drawing.Point(599, 184);
+            this.btn_convert.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.btn_convert.Name = "btn_convert";
+            this.btn_convert.Size = new System.Drawing.Size(120, 136);
+            this.btn_convert.TabIndex = 2;
+            this.btn_convert.Text = "변환 시작";
+            this.btn_convert.UseVisualStyleBackColor = true;
+            this.btn_convert.Click += new System.EventHandler(this.btn_convert_Click);
             // 
             // btn_clear
             // 
             this.btn_clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_clear.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_clear.Location = new System.Drawing.Point(599, 256);
+            this.btn_clear.Location = new System.Drawing.Point(599, 328);
             this.btn_clear.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_clear.Name = "btn_clear";
             this.btn_clear.Size = new System.Drawing.Size(120, 41);
@@ -303,19 +283,6 @@
             this.textSavePath.TabIndex = 12;
             this.textSavePath.TabStop = false;
             // 
-            // btn_convert_hwpx
-            // 
-            this.btn_convert_hwpx.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_convert_hwpx.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert_hwpx.Location = new System.Drawing.Point(599, 164);
-            this.btn_convert_hwpx.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btn_convert_hwpx.Name = "btn_convert_hwpx";
-            this.btn_convert_hwpx.Size = new System.Drawing.Size(120, 41);
-            this.btn_convert_hwpx.TabIndex = 3;
-            this.btn_convert_hwpx.Text = "HWPX로 변환";
-            this.btn_convert_hwpx.UseVisualStyleBackColor = true;
-            this.btn_convert_hwpx.Click += new System.EventHandler(this.btn_convert_hwpx_Click);
-            // 
             // btn_config
             // 
             this.btn_config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -329,18 +296,29 @@
             this.btn_config.UseVisualStyleBackColor = true;
             this.btn_config.Click += new System.EventHandler(this.btn_config_Click);
             // 
-            // btn_convert_hwp
+            // combo_target_format
             // 
-            this.btn_convert_hwp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_convert_hwp.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert_hwp.Location = new System.Drawing.Point(599, 210);
-            this.btn_convert_hwp.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.btn_convert_hwp.Name = "btn_convert_hwp";
-            this.btn_convert_hwp.Size = new System.Drawing.Size(120, 41);
-            this.btn_convert_hwp.TabIndex = 4;
-            this.btn_convert_hwp.Text = "HWP로 변환";
-            this.btn_convert_hwp.UseVisualStyleBackColor = true;
-            this.btn_convert_hwp.Click += new System.EventHandler(this.btn_convert_hwp_Click);
+            this.combo_target_format.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.combo_target_format.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.combo_target_format.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.combo_target_format.FormattingEnabled = true;
+            this.combo_target_format.Location = new System.Drawing.Point(601, 148);
+            this.combo_target_format.Name = "combo_target_format";
+            this.combo_target_format.Size = new System.Drawing.Size(118, 25);
+            this.combo_target_format.TabIndex = 13;
+            // 
+            // label_format
+            // 
+            this.label_format.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label_format.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label_format.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label_format.Font = new System.Drawing.Font("맑은 고딕", 12F);
+            this.label_format.Location = new System.Drawing.Point(601, 121);
+            this.label_format.Name = "label_format";
+            this.label_format.Size = new System.Drawing.Size(118, 27);
+            this.label_format.TabIndex = 14;
+            this.label_format.Text = "변환할 형식";
+            this.label_format.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // FormMain
             // 
@@ -348,16 +326,16 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btn_close;
             this.ClientSize = new System.Drawing.Size(733, 470);
-            this.Controls.Add(this.btn_convert_hwp);
+            this.Controls.Add(this.label_format);
+            this.Controls.Add(this.combo_target_format);
             this.Controls.Add(this.btn_config);
-            this.Controls.Add(this.btn_convert_hwpx);
             this.Controls.Add(this.textSavePath);
             this.Controls.Add(this.btnSavePath);
             this.Controls.Add(this.text_title);
             this.Controls.Add(this.btn_close);
             this.Controls.Add(this.text_log);
             this.Controls.Add(this.btn_clear);
-            this.Controls.Add(this.btn_convert_pdf);
+            this.Controls.Add(this.btn_convert);
             this.Controls.Add(this.list_file);
             this.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -381,7 +359,7 @@
         private System.Windows.Forms.ColumnHeader col_size;
         private System.Windows.Forms.ListView list_file;
         private System.Windows.Forms.ImageList imageList_file;
-        private System.Windows.Forms.Button btn_convert_pdf;
+        private System.Windows.Forms.Button btn_convert;
         private System.Windows.Forms.Button btn_clear;
         private System.Windows.Forms.TextBox text_log;
         private System.Windows.Forms.Button btn_close;
@@ -393,14 +371,12 @@
         private System.Windows.Forms.ToolStripMenuItem list_menu_delete;
         private System.Windows.Forms.ToolStripMenuItem list_menu_clear;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem list_menu_convert_pdf;
+        private System.Windows.Forms.ToolStripMenuItem list_menu_convert;
         private System.Windows.Forms.ToolStripMenuItem list_menu_exit;
-        private System.Windows.Forms.Button btn_convert_hwpx;
-        private System.Windows.Forms.ToolStripMenuItem list_menu_convert_hwpx;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.Button btn_config;
-        private System.Windows.Forms.Button btn_convert_hwp;
-        private System.Windows.Forms.ToolStripMenuItem list_menu_convert_hwp;
+        private System.Windows.Forms.ComboBox combo_target_format;
+        private System.Windows.Forms.Label label_format;
     }
 }
 

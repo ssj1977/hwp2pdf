@@ -19,12 +19,15 @@ namespace hwp2pdf
         bool m_bUseCurrentPath = true;
         string m_strSavePath = "";
         static bool st_bConverting = false;
-        static string st_format = "PDF";
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
         int option_extflag = (1 | 2 | 4); //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
         bool option_PDF_print = true;
         HwpObject hwp_object = new HwpObject(); //한컴 오토메이션을 위한 기본 인터페이스
         bool filecheckdll_ok = false;
+        //쓰레드에서 사용할 변수들
+        static int st_convert_target_index = 0;
+        static string[] st_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
+        static string[] st_ext_array = new string[] { ".pdf", ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
         public FormMain()
         {
             if (hwp_object == null)
@@ -178,6 +181,19 @@ namespace hwp2pdf
             }
             if (m_bUseCurrentPath == true) m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
+            int nCount = Math.Min(st_ext_array.GetLength(0), st_type_array.GetLength(0));
+            // 변환가능 파일 형식 콤보박스 초기화하기
+            combo_target_format.Items.Clear();
+            for (int i = 0; i < nCount; i++)
+            {
+                string str_temp = st_type_array[i] + " (" + st_ext_array[i] + ")";
+                combo_target_format.Items.Add(str_temp);
+            }
+            if (nCount > 0)
+            {
+                combo_target_format.SelectedIndex = 0;
+                st_convert_target_index = combo_target_format.SelectedIndex; //PDF > 나중에는 최종 선택값을 설정에 저장하는 것도 고려 
+            }
         }
         private delegate void add_log_delegate(string text);
         private delegate void show_convert_state_delegate(int nRow, string text);
@@ -222,15 +238,9 @@ namespace hwp2pdf
                 btnSavePath.Enabled = bEnable;
                 btn_clear.Enabled = bEnable;
                 btn_close.Enabled = bEnable;
-                btn_convert_pdf.Enabled = true;
-                btn_convert_hwpx.Enabled = true;
-                btn_convert_hwp.Enabled = true;
-                if (bEnable)    btn_convert_pdf.Text = "PDF로 변환";
-                else            btn_convert_pdf.Text = "변환 중단";
-                if (bEnable)    btn_convert_hwpx.Text = "HWPX로 변환";
-                else            btn_convert_hwpx.Text = "변환 중단";
-                if (bEnable)    btn_convert_hwp.Text = "HWP로 변환";
-                else            btn_convert_hwp.Text = "변환 중단";
+                btn_convert.Enabled = true;
+                if (bEnable)    btn_convert.Text = "변환 시작";
+                else            btn_convert.Text = "변환 중단";
             }
         }
         private void convert_files()
@@ -238,9 +248,7 @@ namespace hwp2pdf
             if (st_bConverting == true)
             {
                 st_bConverting = false;
-                btn_convert_pdf.Enabled = false;
-                btn_convert_hwpx.Enabled = false;
-                btn_convert_hwp.Enabled = false;
+                btn_convert.Enabled = false;
                 return;
             }
             if (list_file.Items.Count <= 0) return;
@@ -257,6 +265,7 @@ namespace hwp2pdf
             st_bConverting = true;
             enable_controls(false);
             th.Start();
+            st_convert_target_index = combo_target_format.SelectedIndex;
         }
         private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
         {
@@ -269,29 +278,24 @@ namespace hwp2pdf
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
+            string target_type = st_type_array[st_convert_target_index];
+            string target_ext = st_ext_array[st_convert_target_index];
             foreach (string file_path in paths)
             {
-                if (filecheckdll_ok == true) hwp_object.SetMessageBoxMode(0x00224421);
-                string file_ext = System.IO.Path.GetExtension(file_path).ToUpper();
-                string file_type = "";
-                if (file_ext.Equals(".HWP")) file_type = "HWP";
-                else if (file_ext.Equals(".HWPX")) file_type = "HWPX";
-                else if (file_ext.Equals(".HML")) file_type = "HWPML2X";
-                else if (file_ext.Equals(".DOCX")) file_type = "OOXML";
-                else if (file_ext.Equals(".DOC")) file_type = "MSWORD";
-                else if (file_ext.Equals(".TXT")) file_type = "UNICODE";
-                else if (file_ext.Equals(".RTF")) file_type = "RTF";
-                if (file_type == st_format)
+                if (filecheckdll_ok == true) hwp_object.SetMessageBoxMode(0x00211411); //HwpCtrl API 문서에 있음
+                string file_ext = System.IO.Path.GetExtension(file_path).ToLower();
+                // 같은 종류인지 검사
+                if (file_ext == target_ext)
                 {
                     show_convert_state(nRow, "변환안함(같은형식)");
                 }
-                else if (hwp_object.Open(file_path, "", "lock:false;forceopen:true;")) //포맷을 지정하지 않으면 자동 인식
+                else if (hwp_object.Open(file_path, "", "lock:false;forceopen:true;")) //포맷을 지정하지 않아도 자동 인식
                 {
                     show_convert_state(nRow, "변환중");
                     string save_path = "";
                     if (bUseCurrentPath == true)  save_path = System.IO.Path.GetDirectoryName(file_path);
                     else                          save_path = strSavePath;
-                    save_path += "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + "." + st_format.ToLower();
+                    save_path += "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + target_ext;
                     //저장할 파일 이름과 겹치는 파일이 이미 있는지 확인하고 설정에 따라 처리
                     bool bSkip = false;
                     bool bChanged = false;
@@ -304,7 +308,7 @@ namespace hwp2pdf
                         {
                             if (bUseCurrentPath == true) save_path = System.IO.Path.GetDirectoryName(file_path);
                             else save_path = strSavePath;
-                            save_path += "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + "(" + temp_num.ToString() + ")." + st_format.ToLower();
+                            save_path += "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + "(" + temp_num.ToString() + ")" + target_ext;
                             bChanged = true;
                         }
                         else if (option_overwrite == 1) //건너뛰기
@@ -331,7 +335,7 @@ namespace hwp2pdf
                     else
                     {
                         bool bSuccess = false;
-                        if (st_format == "PDF" && option_PDF_print == true && m_strPrinter != "")
+                        if (target_type == "PDF" && option_PDF_print == true && m_strPrinter != "")
                         {
                             //HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
                             //HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
@@ -346,36 +350,37 @@ namespace hwp2pdf
                             hwp_print.PrintMethod = (ushort)m_nPrintMethod;
                             hwp_print.Collate = 1;
                             hwp_print.NumCopy = 1;
-                            hwp_print.UserOrder = 0;
+                            //hwp_print.UserOrder = 0;
                             hwp_print.PrintToFile = 1;
-                            hwp_print.Range = 0;
+                            //hwp_print.Range = 0;
                             hwp_print.filename = save_path;
                             hwp_print.PrinterName = m_strPrinter;
-                            hwp_print.UsingPagenum = 1;
-                            hwp_print.ReverseOrder = 0;
-                            hwp_print.Pause = 0;
-                            hwp_print.PrintImage = 1;
-                            hwp_print.PrintDrawObj = 1;
-                            hwp_print.PrintClickHere = 0;
-                            hwp_print.PrintFormObj = 1;
-                            hwp_print.PrintMarkPen = 0;
-                            hwp_print.PrintMemo = 0;
-                            hwp_print.PrintMemoContents = 0;
-                            hwp_print.PrintRevision = 1;
-                            hwp_print.PrintBarcode = 1;
+                            //hwp_print.UsingPagenum = 1;
+                            //hwp_print.ReverseOrder = 0;
+                            //hwp_print.Pause = 0;
+                            //hwp_print.PrintImage = 1;
+                            //hwp_print.PrintDrawObj = 1;
+                            //hwp_print.PrintClickHere = 0;
+                            //hwp_print.PrintFormObj = 1;
+                            //hwp_print.PrintMarkPen = 0;
+                            //hwp_print.PrintMemo = 0;
+                            //hwp_print.PrintMemoContents = 0;
+                            //hwp_print.PrintRevision = 1;
+                            //hwp_print.PrintBarcode = 1;
                             hwp_print.Flags = 8192;
                             hwp_print.Device = 3;
-                            hwp_print.PrintPronounce = 0;
-                            if (hwp_action.Execute("Print", hwp_set) == true)
-                            {
-                                bSuccess = true;
-                                Thread.Sleep(1000); //기다리지 않으면 가끔 '다른이름으로 저장' 창이 뜸
-                            }
+                            //hwp_print.PrintPronounce = 0;
+                            bSuccess = hwp_action.Execute("PrintToPDF", hwp_set);
+                            //if (hwp_action.Execute("PrintToPDF", hwp_set) == true)
+                            //{
+                            //    bSuccess = true;
+                            //    Thread.Sleep(1000); //기다리지 않으면 가끔 '다른이름으로 저장' 창이 뜸
+                            //}
                         }
                         else
                         {
                             //SaveAs의 경우 PDF 변환시 HWP파일의 모아찍기 설정은 그대로 유지됨
-                            bSuccess = hwp_object.SaveAs(save_path, st_format, "");
+                            bSuccess = hwp_object.SaveAs(save_path, target_type, "");
                         }
                         if (bSuccess)
                         {
@@ -400,37 +405,14 @@ namespace hwp2pdf
             st_bConverting = false;
             enable_controls(true);
         }
-        private void btn_convert_pdf_Click(object sender, EventArgs e)
+        private void btn_convert_Click(object sender, EventArgs e)
         {
-            st_format = "PDF";
             convert_files();
         }
-        private void list_menu_convert_pdf_Click(object sender, EventArgs e)
+        private void list_menu_convert_Click(object sender, EventArgs e)
         {
-            st_format = "PDF";
             convert_files();
         }
-        private void btn_convert_hwpx_Click(object sender, EventArgs e)
-        {
-            st_format = "HWPX";
-            convert_files();
-        }
-        private void list_menu_convert_hwpx_Click(object sender, EventArgs e)
-        {
-            st_format = "HWPX";
-            convert_files();
-        }
-        private void btn_convert_hwp_Click(object sender, EventArgs e)
-        {
-            st_format = "HWP";
-            convert_files();
-        }
-        private void list_menu_convert_hwp_Click(object sender, EventArgs e)
-        {
-            st_format = "HWP";
-            convert_files();
-        }
-
         private void list_file_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
