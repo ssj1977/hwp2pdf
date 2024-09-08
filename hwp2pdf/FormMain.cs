@@ -26,8 +26,10 @@ namespace hwp2pdf
         bool filecheckdll_ok = false;
         //쓰레드에서 사용할 변수들
         static int st_convert_target_index = 0;
-        static string[] target_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
-        static string[] target_ext_array = new string[] { ".pdf", ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
+        //static string[] target_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
+        //static string[] target_ext_array = new string[] { ".pdf", ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
+        static string[] target_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "UNICODE", "RTF" };
+        static string[] target_ext_array = new string[] { ".pdf", ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".txt", ".rtf" };
         //public static string[] source_type_array = new string[] { "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
         public static string[] source_ext_array = new string[] { ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
         public FormMain()
@@ -363,7 +365,7 @@ namespace hwp2pdf
                             //hwp_print.PrintDrawObj = 1;
                             //hwp_print.PrintClickHere = 0;
                             //hwp_print.PrintFormObj = 1;
-                            //hwp_print.PrintMarkPen = 0;
+                            //hwp_print.PrintMarkPen = 0;  // 추후 옵션 여부 검토할 것
                             //hwp_print.PrintMemo = 0;
                             //hwp_print.PrintMemoContents = 0;
                             //hwp_print.PrintRevision = 1;
