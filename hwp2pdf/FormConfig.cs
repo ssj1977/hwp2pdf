@@ -12,7 +12,7 @@ namespace hwp2pdf
     public partial class FormConfig : Form
     {
         int m_option_overwite = 0;
-        int m_option_extflag = 0; //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
+        int m_option_source_ext_flag = 0; //비트플래그 타입 - 32개까지 밖에 안되는 문제가 있음
         bool m_option_PDF_print = true;
         string m_strPrinter = "";
         int m_nPrintMethod = 1; 
@@ -24,7 +24,7 @@ namespace hwp2pdf
         public void setOption(int option_overwrite, int option_extflag, bool option_PDF_print, string strPrinter, int nPrintMethod)
         {
             m_option_overwite = option_overwrite;
-            m_option_extflag = option_extflag;
+            m_option_source_ext_flag = option_extflag;
             m_option_PDF_print = option_PDF_print;
             m_strPrinter = strPrinter;
             m_nPrintMethod = nPrintMethod;
@@ -35,7 +35,7 @@ namespace hwp2pdf
         }
         public int get_option_extflag()
         {
-            return m_option_extflag;
+            return m_option_source_ext_flag;
         }
         public bool get_option_PDF_print()
         {
@@ -55,15 +55,14 @@ namespace hwp2pdf
             else if (radioButton_skip.Checked == true) m_option_overwite = 1;
             else if (radioButton_overwrite.Checked == true) m_option_overwite = 2;
 
-            m_option_extflag = 0;
-            if (cb_hwp.Checked == true) m_option_extflag = m_option_extflag | 1;
-            if (cb_hwpx.Checked == true) m_option_extflag = m_option_extflag | 2;
-            if (cb_hml.Checked == true) m_option_extflag = m_option_extflag | 4;
-            if (cb_doc.Checked == true) m_option_extflag = m_option_extflag | 8;
-            if (cb_docx.Checked == true) m_option_extflag = m_option_extflag | 16;
-            if (cb_rtf.Checked == true) m_option_extflag = m_option_extflag | 32;
-            if (cb_txt.Checked == true) m_option_extflag = m_option_extflag | 64;
-            
+            m_option_source_ext_flag = 0;
+            int flag = 1;
+            foreach (ListViewItem ext_item in list_ext_option.Items)
+            {
+                if (ext_item.Checked == true) m_option_source_ext_flag = m_option_source_ext_flag | flag;
+                flag = flag * 2;
+            }
+           
             m_option_PDF_print = radio_PDF_Print.Checked;
             m_strPrinter = comboBox_PDF_Printer.SelectedItem.ToString();
             int nTemp = comboBox_PDF_PrintMethod.SelectedIndex;
@@ -90,14 +89,13 @@ namespace hwp2pdf
             if (m_option_overwite == 0) radioButton_newname.Checked = true;
             else if (m_option_overwite == 1) radioButton_skip.Checked = true;
             else if (m_option_overwite == 2) radioButton_overwrite.Checked = true;
-
-            if ((m_option_extflag & 1) != 0) cb_hwp.Checked = true;
-            if ((m_option_extflag & 2) != 0) cb_hwpx.Checked = true;
-            if ((m_option_extflag & 4) != 0) cb_hml.Checked = true;
-            if ((m_option_extflag & 8) != 0) cb_doc.Checked = true;
-            if ((m_option_extflag & 16) != 0) cb_docx.Checked = true;
-            if ((m_option_extflag & 32) != 0) cb_rtf.Checked = true;
-            if ((m_option_extflag & 64) != 0) cb_txt.Checked = true;
+            int flag = 1;
+            foreach (string temp_ext in FormMain.source_ext_array)
+            {
+                ListViewItem new_item = list_ext_option.Items.Add(temp_ext);
+                new_item.Checked = ((m_option_source_ext_flag & flag) != 0) ? true : false;
+                flag = flag * 2;
+            }
 
             if (m_option_PDF_print == true) radio_PDF_Print.Checked = true;
             else radio_PDF_SaveAs.Checked = true;

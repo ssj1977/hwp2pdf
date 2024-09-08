@@ -123,7 +123,7 @@
             this.toolStripSeparator2,
             this.list_menu_exit});
             this.contextMenu_list.Name = "contextMenu_list";
-            this.contextMenu_list.Size = new System.Drawing.Size(197, 148);
+            this.contextMenu_list.Size = new System.Drawing.Size(197, 126);
             this.contextMenu_list.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_list_Opening);
             // 
             // list_menu_add
@@ -306,11 +306,12 @@
             this.combo_target_format.Name = "combo_target_format";
             this.combo_target_format.Size = new System.Drawing.Size(118, 25);
             this.combo_target_format.TabIndex = 13;
+            this.combo_target_format.SelectionChangeCommitted += new System.EventHandler(this.combo_target_format_SelectionChangeCommitted);
             // 
             // label_format
             // 
             this.label_format.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_format.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label_format.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.label_format.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label_format.Font = new System.Drawing.Font("맑은 고딕", 12F);
             this.label_format.Location = new System.Drawing.Point(601, 121);

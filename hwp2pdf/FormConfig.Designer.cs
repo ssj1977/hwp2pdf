@@ -36,14 +36,6 @@ namespace hwp2pdf
             this.radioButton_newname = new System.Windows.Forms.RadioButton();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cb_hml = new System.Windows.Forms.CheckBox();
-            this.cb_txt = new System.Windows.Forms.CheckBox();
-            this.cb_rtf = new System.Windows.Forms.CheckBox();
-            this.cb_docx = new System.Windows.Forms.CheckBox();
-            this.cb_doc = new System.Windows.Forms.CheckBox();
-            this.cb_hwpx = new System.Windows.Forms.CheckBox();
-            this.cb_hwp = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label_PDF_PrintMethod = new System.Windows.Forms.Label();
             this.comboBox_PDF_PrintMethod = new System.Windows.Forms.ComboBox();
@@ -51,8 +43,9 @@ namespace hwp2pdf
             this.comboBox_PDF_Printer = new System.Windows.Forms.ComboBox();
             this.radio_PDF_Print = new System.Windows.Forms.RadioButton();
             this.radio_PDF_SaveAs = new System.Windows.Forms.RadioButton();
+            this.list_ext_option = new System.Windows.Forms.ListView();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox_overwrite_option.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -126,93 +119,6 @@ namespace hwp2pdf
             this.btnOk.Text = "확인";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.cb_hml);
-            this.groupBox1.Controls.Add(this.cb_txt);
-            this.groupBox1.Controls.Add(this.cb_rtf);
-            this.groupBox1.Controls.Add(this.cb_docx);
-            this.groupBox1.Controls.Add(this.cb_doc);
-            this.groupBox1.Controls.Add(this.cb_hwpx);
-            this.groupBox1.Controls.Add(this.cb_hwp);
-            this.groupBox1.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.groupBox1.Location = new System.Drawing.Point(13, 180);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(469, 108);
-            this.groupBox1.TabIndex = 1;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "폴더를 불러올 때 폴더 안의 파일 중에서 추가할 확장자";
-            // 
-            // cb_hml
-            // 
-            this.cb_hml.AutoSize = true;
-            this.cb_hml.Location = new System.Drawing.Point(390, 40);
-            this.cb_hml.Name = "cb_hml";
-            this.cb_hml.Size = new System.Drawing.Size(64, 25);
-            this.cb_hml.TabIndex = 2;
-            this.cb_hml.Text = "HML";
-            this.cb_hml.UseVisualStyleBackColor = true;
-            // 
-            // cb_txt
-            // 
-            this.cb_txt.AutoSize = true;
-            this.cb_txt.Location = new System.Drawing.Point(279, 71);
-            this.cb_txt.Name = "cb_txt";
-            this.cb_txt.Size = new System.Drawing.Size(57, 25);
-            this.cb_txt.TabIndex = 6;
-            this.cb_txt.Text = "TXT";
-            this.cb_txt.UseVisualStyleBackColor = true;
-            // 
-            // cb_rtf
-            // 
-            this.cb_rtf.AutoSize = true;
-            this.cb_rtf.Location = new System.Drawing.Point(279, 40);
-            this.cb_rtf.Name = "cb_rtf";
-            this.cb_rtf.Size = new System.Drawing.Size(56, 25);
-            this.cb_rtf.TabIndex = 5;
-            this.cb_rtf.Text = "RTF";
-            this.cb_rtf.UseVisualStyleBackColor = true;
-            // 
-            // cb_docx
-            // 
-            this.cb_docx.AutoSize = true;
-            this.cb_docx.Location = new System.Drawing.Point(147, 71);
-            this.cb_docx.Name = "cb_docx";
-            this.cb_docx.Size = new System.Drawing.Size(73, 25);
-            this.cb_docx.TabIndex = 4;
-            this.cb_docx.Text = "DOCX";
-            this.cb_docx.UseVisualStyleBackColor = true;
-            // 
-            // cb_doc
-            // 
-            this.cb_doc.AutoSize = true;
-            this.cb_doc.Location = new System.Drawing.Point(147, 40);
-            this.cb_doc.Name = "cb_doc";
-            this.cb_doc.Size = new System.Drawing.Size(63, 25);
-            this.cb_doc.TabIndex = 3;
-            this.cb_doc.Text = "DOC";
-            this.cb_doc.UseVisualStyleBackColor = true;
-            // 
-            // cb_hwpx
-            // 
-            this.cb_hwpx.AutoSize = true;
-            this.cb_hwpx.Location = new System.Drawing.Point(18, 71);
-            this.cb_hwpx.Name = "cb_hwpx";
-            this.cb_hwpx.Size = new System.Drawing.Size(77, 25);
-            this.cb_hwpx.TabIndex = 1;
-            this.cb_hwpx.Text = "HWPX";
-            this.cb_hwpx.UseVisualStyleBackColor = true;
-            // 
-            // cb_hwp
-            // 
-            this.cb_hwp.AutoSize = true;
-            this.cb_hwp.Location = new System.Drawing.Point(18, 40);
-            this.cb_hwp.Name = "cb_hwp";
-            this.cb_hwp.Size = new System.Drawing.Size(67, 25);
-            this.cb_hwp.TabIndex = 0;
-            this.cb_hwp.Text = "HWP";
-            this.cb_hwp.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
@@ -305,14 +211,37 @@ namespace hwp2pdf
             this.radio_PDF_SaveAs.UseVisualStyleBackColor = true;
             this.radio_PDF_SaveAs.CheckedChanged += new System.EventHandler(this.radio_PDF_SaveAs_CheckedChanged);
             // 
+            // list_ext_option
+            // 
+            this.list_ext_option.CheckBoxes = true;
+            this.list_ext_option.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.list_ext_option.HideSelection = false;
+            this.list_ext_option.Location = new System.Drawing.Point(13, 204);
+            this.list_ext_option.Name = "list_ext_option";
+            this.list_ext_option.Size = new System.Drawing.Size(469, 86);
+            this.list_ext_option.TabIndex = 6;
+            this.list_ext_option.UseCompatibleStateImageBehavior = false;
+            this.list_ext_option.View = System.Windows.Forms.View.SmallIcon;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label1.Location = new System.Drawing.Point(14, 179);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(210, 21);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "불러올 수 있는 파일 확장자";
+            // 
             // FormConfig
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(498, 552);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.list_ext_option);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.groupBox_overwrite_option);
@@ -328,11 +257,10 @@ namespace hwp2pdf
             this.Load += new System.EventHandler(this.FormConfig_Load);
             this.groupBox_overwrite_option.ResumeLayout(false);
             this.groupBox_overwrite_option.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -344,14 +272,6 @@ namespace hwp2pdf
         private System.Windows.Forms.RadioButton radioButton_newname;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.CheckBox cb_docx;
-        private System.Windows.Forms.CheckBox cb_doc;
-        private System.Windows.Forms.CheckBox cb_hwpx;
-        private System.Windows.Forms.CheckBox cb_hwp;
-        private System.Windows.Forms.CheckBox cb_rtf;
-        private System.Windows.Forms.CheckBox cb_hml;
-        private System.Windows.Forms.CheckBox cb_txt;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label_PDF_PrintMethod;
         private System.Windows.Forms.ComboBox comboBox_PDF_PrintMethod;
@@ -359,5 +279,7 @@ namespace hwp2pdf
         private System.Windows.Forms.ComboBox comboBox_PDF_Printer;
         private System.Windows.Forms.RadioButton radio_PDF_Print;
         private System.Windows.Forms.RadioButton radio_PDF_SaveAs;
+        private System.Windows.Forms.ListView list_ext_option;
+        private System.Windows.Forms.Label label1;
     }
 }

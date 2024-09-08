@@ -20,14 +20,16 @@ namespace hwp2pdf
         string m_strSavePath = "";
         static bool st_bConverting = false;
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
-        int option_extflag = (1 | 2 | 4); //비트플래그 타입 : 1 = hwp / 2 = hwpx / 4 = hml / 8 = doc / 16 =docx / 32 = rtf / 64 = txt
+        int option_source_ext_flag = (1 | 2 | 4); //Source 확장자에 대한 비트플래그 타입
         bool option_PDF_print = true;
         HwpObject hwp_object = new HwpObject(); //한컴 오토메이션을 위한 기본 인터페이스
         bool filecheckdll_ok = false;
         //쓰레드에서 사용할 변수들
         static int st_convert_target_index = 0;
-        static string[] st_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
-        static string[] st_ext_array = new string[] { ".pdf", ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
+        static string[] target_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
+        static string[] target_ext_array = new string[] { ".pdf", ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
+        //public static string[] source_type_array = new string[] { "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
+        public static string[] source_ext_array = new string[] { ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
         public FormMain()
         {
             if (hwp_object == null)
@@ -45,10 +47,12 @@ namespace hwp2pdf
             if (strTemp.Length > 0) m_bUseCurrentPath = bool.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "OptionOverwrite", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0) option_overwrite = int.Parse(strTemp.ToString());
-            GetPrivateProfileString("Main", "OptionExtFlag", "", strTemp, strTemp.Capacity, ini_path);
-            if (strTemp.Length > 0) option_extflag = int.Parse(strTemp.ToString());
+            GetPrivateProfileString("Main", "OptionExtFlags", "", strTemp, strTemp.Capacity, ini_path);  // 과거 버전은 OptionExtFlag 
+            if (strTemp.Length > 0) option_source_ext_flag = int.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "OptionPDFPrint", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0) option_PDF_print = bool.Parse(strTemp.ToString());
+            GetPrivateProfileString("Main", "CurrentTargetType", "", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) st_convert_target_index = int.Parse(strTemp.ToString());
             GetPrivateProfileString("Main", "PrinterName", "", strTemp, strTemp.Capacity, ini_path);
             m_strPrinter = strTemp.ToString();
             GetPrivateProfileString("Main", "PrintMethod", "", strTemp, strTemp.Capacity, ini_path);
@@ -156,9 +160,9 @@ namespace hwp2pdf
                     bPrinterInstalled = true;
                     break;
                 }
-                else if (name.Contains("PDF"))
+                else if (name.ToLower().Contains("pdf"))
                 {
-                    if (name.Contains("Hancom PDF"))
+                    if (name.ToLower().Contains("hancom"))
                     {
                         bPrinterInstalled = true;
                         if (bSetDefault == true)
@@ -167,7 +171,7 @@ namespace hwp2pdf
                             break;  
                         }
                     }
-                    if (name.Contains("Microsoft Print to PDF"))
+                    if (name.ToLower().Contains("microsoft"))
                     {
                         bPrinterInstalled = true;
                         //프린터가 설정되지 않은 상태에서 한컴PDF가 없는 경우 MS PDF 사용
@@ -181,19 +185,16 @@ namespace hwp2pdf
             }
             if (m_bUseCurrentPath == true) m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
-            int nCount = Math.Min(st_ext_array.GetLength(0), st_type_array.GetLength(0));
+            int nCount = Math.Min(target_ext_array.GetLength(0), target_type_array.GetLength(0));
             // 변환가능 파일 형식 콤보박스 초기화하기
             combo_target_format.Items.Clear();
             for (int i = 0; i < nCount; i++)
             {
-                string str_temp = st_type_array[i] + " (" + st_ext_array[i] + ")";
+                string str_temp = target_type_array[i] + " (" + target_ext_array[i] + ")";
                 combo_target_format.Items.Add(str_temp);
             }
-            if (nCount > 0)
-            {
-                combo_target_format.SelectedIndex = 0;
-                st_convert_target_index = combo_target_format.SelectedIndex; //PDF > 나중에는 최종 선택값을 설정에 저장하는 것도 고려 
-            }
+            if (nCount > st_convert_target_index) combo_target_format.SelectedIndex = st_convert_target_index;
+            else if (nCount > 0) combo_target_format.SelectedIndex = 0;
         }
         private delegate void add_log_delegate(string text);
         private delegate void show_convert_state_delegate(int nRow, string text);
@@ -278,8 +279,8 @@ namespace hwp2pdf
             int nRow =0 ;
             int nConverted = 0;
             add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
-            string target_type = st_type_array[st_convert_target_index];
-            string target_ext = st_ext_array[st_convert_target_index];
+            string target_type = target_type_array[st_convert_target_index];
+            string target_ext = target_ext_array[st_convert_target_index];
             foreach (string file_path in paths)
             {
                 if (filecheckdll_ok == true) hwp_object.SetMessageBoxMode(0x00211411); //HwpCtrl API 문서에 있음
@@ -431,7 +432,7 @@ namespace hwp2pdf
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             Array.Sort(files, new FileNameComparer());
-            int nAdded = add_files(files, 0xFFFF); //처음 파일 추가시는 모든 확장자를 인식하도록
+            int nAdded = add_files(files, option_source_ext_flag);
             add_log(String.Format("{0}개를 목록에 추가하였습니다.", nAdded));
         }
         private string GetFileSizeString(double byteCount)
@@ -457,21 +458,27 @@ namespace hwp2pdf
                 {
                     string[] dirs_only = Directory.GetDirectories(file);
                     string[] files_only = Directory.GetFiles(file);
-                    nAdded += add_files(dirs_only, option_extflag); //폴더 내의 파일을 모두 가져올때는 정해진 확장자만
-                    nAdded += add_files(files_only, option_extflag);
+                    nAdded += add_files(dirs_only, option_source_ext_flag); 
+                    nAdded += add_files(files_only, option_source_ext_flag);
                 }
                 else
                 {
                     FileInfo fInfo = new FileInfo(System.IO.Path.GetFullPath(file));
                     string file_size = GetFileSizeString(fInfo.Length);
-                    string file_ext = fInfo.Extension.ToUpper();
-                    if ((file_ext.Equals(".HWP") && ((extflag & 1) != 0))
-                        || (file_ext.Equals(".HWPX") && ((extflag & 2) != 0))
-                        || (file_ext.Equals(".HML") && ((extflag & 4) != 0))
-                        || (file_ext.Equals(".DOC") && ((extflag & 8) != 0))
-                        || (file_ext.Equals(".DOCX") && ((extflag & 16) != 0))
-                        || (file_ext.Equals(".RTF") && ((extflag & 32) != 0))
-                        || (file_ext.Equals(".TXT") && ((extflag & 64) != 0)))
+                    string file_ext = fInfo.Extension.ToLower();
+
+                    int flag_compare = 1;
+                    bool is_correct_ext = false;
+                    foreach (string ext_item in source_ext_array )
+                    {
+                        if ((file_ext.Equals(ext_item.ToLower())) && ((extflag & flag_compare) != 0))
+                        {
+                            is_correct_ext = true;
+                            break;
+                        }
+                        flag_compare = flag_compare * 2;
+                    }
+                    if (is_correct_ext)
                     {
                         if (CheckDuplication(fInfo.FullName) == false)
                         {
@@ -529,8 +536,9 @@ namespace hwp2pdf
             if (m_bUseCurrentPath == true) m_strSavePath = "";
             WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
             WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path);
-            WritePrivateProfileString("Main", "OptionExtFlag", option_extflag.ToString(), ini_path);
+            WritePrivateProfileString("Main", "OptionExtFlags", option_source_ext_flag.ToString(), ini_path); // 과거 버전은 OptionExtFlag 
             WritePrivateProfileString("Main", "OptionPDFPrint", option_PDF_print.ToString(), ini_path);
+            WritePrivateProfileString("Main", "CurrentTargetType", st_convert_target_index.ToString(), ini_path);
             WritePrivateProfileString("Main", "PrinterName", m_strPrinter, ini_path);
             WritePrivateProfileString("Main", "PrintMethod", m_nPrintMethod.ToString(), ini_path);
             String strTemp;
@@ -607,15 +615,20 @@ namespace hwp2pdf
         private void btn_config_Click(object sender, EventArgs e)
         {
             FormConfig dlg = new FormConfig();
-            dlg.setOption(option_overwrite, option_extflag, option_PDF_print, m_strPrinter, m_nPrintMethod);
+            dlg.setOption(option_overwrite, option_source_ext_flag, option_PDF_print, m_strPrinter, m_nPrintMethod);
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 option_overwrite = dlg.get_option_overwrite();
-                option_extflag = dlg.get_option_extflag();
+                option_source_ext_flag = dlg.get_option_extflag();
                 option_PDF_print = dlg.get_option_PDF_print();
                 m_strPrinter = dlg.get_option_printer();
                 m_nPrintMethod = dlg.get_option_printmethod();
             }
+        }
+
+        private void combo_target_format_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            st_convert_target_index = combo_target_format.SelectedIndex;
         }
     }
 }
