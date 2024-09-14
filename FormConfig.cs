@@ -13,7 +13,7 @@ namespace hwp2pdf
     {
         int m_option_overwite = 0;
         int m_option_source_ext_flag = 0; //비트플래그 타입 - 32개까지 밖에 안되는 문제가 있음
-        bool m_option_PDF_print = true;
+        bool m_option_PDF_print = false;
         string m_strPrinter = "";
         int m_nPrintMethod = 1; 
 
