@@ -22,7 +22,7 @@ namespace hwp2pdf
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
         int option_source_ext_flag = (1 | 2 | 4); //Source 확장자에 대한 비트플래그 타입
         bool option_PDF_print = true;
-        HwpObject hwp_object = new HwpObject(); //한컴 오토메이션을 위한 기본 인터페이스
+        HwpObject hwp_object = null; //한컴 오토메이션을 위한 기본 인터페이스
         bool filecheckdll_ok = false;
         //쓰레드에서 사용할 변수들
         static int st_convert_target_index = 0;
@@ -34,10 +34,27 @@ namespace hwp2pdf
         public static string[] source_ext_array = new string[] { ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
         public FormMain()
         {
-            if (hwp_object == null)
+            //한컴오피스 설치여부 확인
+            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
+            if (reg == null)
             {
-                MessageBox.Show("한글 오토메이션을 시작하지 못했습니다.");
-                return;
+                MessageBox.Show("한컴오피스 한글2010 이상 버전이 설치되어 있지 않습니다.", "hwp2pdf");
+                this.Load += (s, e) => Close(); return;
+            }
+            try
+            {
+                hwp_object = new HwpObject(); //한컴 오토메이션을 위한 기본 인터페이스
+                if (hwp_object == null)
+                {
+                    MessageBox.Show("한컴오피스 초기화에 실패했습니다. \r\n(알수 없는 이유)", "hwp2pdf");
+                    this.Load += (s, e) => Close(); return; // 생성자 내에서 바로 닫으려면 이벤트를 추가해서 처리
+                                                            //Environment.Exit(0); //생성자 내에서 바로 닫는 두번째 방법
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"한컴오피스 초기화에 실패했습니다. \r\n {ex.Message}", "hwp2pdf");
+                this.Load += (s, e) => Close(); return;
             }
             InitializeComponent();
             //ini 파일에서 정보 불러오기
@@ -82,28 +99,21 @@ namespace hwp2pdf
                     this.SetDesktopBounds(x, y, w, h);
                 }
             }
-
             // FilePathCheckerModuleExample.DLL이 있어야 한컴오토메이션이 파일에 바로 접근 가능
             // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpAutomation\Modules"에 
             // FilePathCheckerModuleExample 값으로 DLL의 위치가 등록되어 있어야 함
             //레지스트리에 보안모듈 추가
-            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
-            if (reg == null)
-            {
-                MessageBox.Show("한컴오피스 한글2010 이상 버전이 설치되어 있지 않습니다.");
-                return;
-            }
             reg = reg.CreateSubKey("HwpAutomation");
             if (reg == null)
             {
-                MessageBox.Show("레지스트리 항목(HwpAutomation) 추가 중 오류가 발생했습니다.");
-                return;
+                MessageBox.Show("레지스트리 항목(HwpAutomation) 추가 중 오류가 발생했습니다.", "hwp2pdf");
+                this.Load += (s, e) => Close(); return;
             }
             reg = reg.CreateSubKey("Modules");
             if (reg == null)
             {
-                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다.");
-                return;
+                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다.", "hwp2pdf");
+                this.Load += (s, e) => Close(); return;
             }
             Object temp = reg.GetValue("FilePathCheckerModuleExample");
             bool bRegisterCurrentPath = false;
@@ -183,7 +193,7 @@ namespace hwp2pdf
             }
             if (bPrinterInstalled == false)
             {
-                MessageBox.Show("한컴 PDF 또는 Micosoft Print to PDF가 설치되어 있지 않습니다.");
+                MessageBox.Show("한컴 PDF 또는 Micosoft Print to PDF가 설치되어 있지 않습니다.", "hwp2pdf");
             }
             if (m_bUseCurrentPath == true) m_strSavePath = System.IO.Directory.GetCurrentDirectory();
             update_path();
@@ -223,7 +233,7 @@ namespace hwp2pdf
             }
             else
             {
-                list_file.Items[nRow].SubItems[3].Text = text;
+                list_file.Items[nRow].SubItems[CONST.COL_STATUS].Text = text;
                 list_file.RedrawItems(nRow, nRow, false);
                 list_file.EnsureVisible(nRow);
             }
@@ -259,8 +269,8 @@ namespace hwp2pdf
             int nIndex = 0;
             foreach (ListViewItem item in list_file.Items)
             {
-                paths[nIndex] = Path.Combine(item.SubItems[1].Text, item.SubItems[0].Text);
-                item.SubItems[3].Text = "";
+                paths[nIndex] = Path.Combine(item.SubItems[CONST.COL_PATH].Text, item.SubItems[CONST.COL_NAME].Text);
+                item.SubItems[CONST.COL_STATUS].Text = "";
                 nIndex++;
             }
             Thread th = new Thread(() => convert_thread(paths, m_bUseCurrentPath, m_strSavePath));
@@ -292,7 +302,7 @@ namespace hwp2pdf
                 {
                     show_convert_state(nRow, "변환안함(같은형식)");
                 }
-                else if (hwp_object.Open(file_path, "", "lock:false;forceopen:true;")) //포맷을 지정하지 않아도 자동 인식
+                else if (hwp_object.Open(file_path, "", "lock:false;forceopen:true;suspendpassword:true;")) //포맷을 지정하지 않아도 자동 인식
                 {
                     show_convert_state(nRow, "변환중");
                     string save_path = "";
@@ -424,7 +434,7 @@ namespace hwp2pdf
         {
             foreach (ListViewItem item in list_file.Items)
             {
-                string anotherpath = Path.Combine(item.SubItems[0].Text, item.SubItems[1].Text);
+                string anotherpath = Path.Combine(item.SubItems[CONST.COL_PATH].Text, item.SubItems[CONST.COL_NAME].Text);
                 if (filepath.Equals(anotherpath, StringComparison.CurrentCultureIgnoreCase))
                     return true;
             }
@@ -491,9 +501,11 @@ namespace hwp2pdf
                                 imageList_file.Images.Add(file_ext, iconForFile);
                             }
                             ListViewItem newItem = list_file.Items.Add(fInfo.Name, file_ext);
-                            newItem.SubItems.Add(fInfo.DirectoryName);
-                            newItem.SubItems.Add(GetFileSizeString(fInfo.Length)); // 크기
-                            newItem.SubItems.Add(""); // 처리상태
+                            for (int i=1; i< CONST.COL_TOTAL; i++) newItem.SubItems.Add(""); //칼럼 초기화
+                            //newItem.SubItems[CONST.COL_NAME].Text = fInfo.Name;
+                            newItem.SubItems[CONST.COL_STATUS].Text = "";
+                            newItem.SubItems[CONST.COL_SIZE].Text = GetFileSizeString(fInfo.Length);
+                            newItem.SubItems[CONST.COL_PATH].Text = fInfo.DirectoryName;
                             nAdded++;
                         }
                     }
@@ -634,6 +646,16 @@ namespace hwp2pdf
         }
     }
 }
+
+static class CONST
+{
+    public const int COL_NAME = 0;
+    public const int COL_STATUS = 1;
+    public const int COL_SIZE = 2;
+    public const int COL_PATH = 3;
+    public const int COL_TOTAL = 4; //전체 개수
+}
+
 
 public class FileNameComparer : IComparer<string>
 {

@@ -90,9 +90,9 @@
             this.list_file.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.list_file.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.col_name,
-            this.col_path,
+            this.col_status,
             this.col_size,
-            this.col_status});
+            this.col_path});
             this.list_file.ContextMenuStrip = this.contextMenu_list;
             this.list_file.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.list_file.ForeColor = System.Drawing.SystemColors.WindowText;
@@ -103,9 +103,9 @@
             this.list_file.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.list_file.MinimumSize = new System.Drawing.Size(300, 200);
             this.list_file.Name = "list_file";
-            this.list_file.Size = new System.Drawing.Size(581, 282);
+            this.list_file.Size = new System.Drawing.Size(566, 282);
             this.list_file.SmallImageList = this.imageList_file;
-            this.list_file.TabIndex = 0;
+            this.list_file.TabIndex = 6;
             this.list_file.UseCompatibleStateImageBehavior = false;
             this.list_file.View = System.Windows.Forms.View.Details;
             this.list_file.DrawColumnHeader += new System.Windows.Forms.DrawListViewColumnHeaderEventHandler(this.list_file_DrawColumnHeader);
@@ -186,10 +186,10 @@
             // 
             this.btn_convert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_convert.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_convert.Location = new System.Drawing.Point(599, 184);
+            this.btn_convert.Location = new System.Drawing.Point(584, 184);
             this.btn_convert.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_convert.Name = "btn_convert";
-            this.btn_convert.Size = new System.Drawing.Size(120, 136);
+            this.btn_convert.Size = new System.Drawing.Size(135, 123);
             this.btn_convert.TabIndex = 2;
             this.btn_convert.Text = "변환 시작";
             this.btn_convert.UseVisualStyleBackColor = true;
@@ -197,13 +197,13 @@
             // 
             // btn_clear
             // 
-            this.btn_clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_clear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_clear.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_clear.Location = new System.Drawing.Point(599, 328);
+            this.btn_clear.Location = new System.Drawing.Point(584, 315);
             this.btn_clear.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_clear.Name = "btn_clear";
-            this.btn_clear.Size = new System.Drawing.Size(120, 41);
-            this.btn_clear.TabIndex = 5;
+            this.btn_clear.Size = new System.Drawing.Size(135, 41);
+            this.btn_clear.TabIndex = 3;
             this.btn_clear.Text = "목록 초기화";
             this.btn_clear.UseVisualStyleBackColor = true;
             this.btn_clear.Click += new System.EventHandler(this.btn_clear_Click);
@@ -219,7 +219,7 @@
             this.text_log.Name = "text_log";
             this.text_log.ReadOnly = true;
             this.text_log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.text_log.Size = new System.Drawing.Size(581, 50);
+            this.text_log.Size = new System.Drawing.Size(566, 50);
             this.text_log.TabIndex = 6;
             this.text_log.TabStop = false;
             this.text_log.WordWrap = false;
@@ -229,11 +229,11 @@
             this.btn_close.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btn_close.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btn_close.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_close.Location = new System.Drawing.Point(599, 407);
+            this.btn_close.Location = new System.Drawing.Point(584, 407);
             this.btn_close.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_close.Name = "btn_close";
-            this.btn_close.Size = new System.Drawing.Size(120, 50);
-            this.btn_close.TabIndex = 7;
+            this.btn_close.Size = new System.Drawing.Size(135, 50);
+            this.btn_close.TabIndex = 5;
             this.btn_close.Text = "종료";
             this.btn_close.UseVisualStyleBackColor = true;
             this.btn_close.Click += new System.EventHandler(this.btn_close_Click);
@@ -254,19 +254,19 @@
             this.text_title.Size = new System.Drawing.Size(707, 69);
             this.text_title.TabIndex = 8;
             this.text_title.TabStop = false;
-            this.text_title.Text = "아래 목록에 포함된 파일을 PDF, HWPX, HWP 파일로 변환합니다.\r\nHWP, HWPX, HML, RTF, TXT, DOC, DOCX 파일을" +
-    " 변환할 수 있습니다.\r\n파일을 끌어서 놓기나 우클릭 메뉴로 추가하고 변환 버튼을 클릭해 주세요.";
+            this.text_title.Text = "한컴오피스로 아래 목록의 파일을 열어서 형식을 일괄 변환합니다.\r\n\'변환할 형식\'아래의 \'∨\'를 클릭하면 변환할 형식을 바꿀 수 있습니다.\r\n파일" +
+    "을 끌어서 놓거나 우클릭 메뉴로 추가하고 \'변환 시작\'을 클릭하세요.";
             this.text_title.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // btnSavePath
             // 
             this.btnSavePath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSavePath.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btnSavePath.Location = new System.Drawing.Point(599, 88);
+            this.btnSavePath.Location = new System.Drawing.Point(584, 88);
             this.btnSavePath.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btnSavePath.Name = "btnSavePath";
-            this.btnSavePath.Size = new System.Drawing.Size(120, 24);
-            this.btnSavePath.TabIndex = 1;
+            this.btnSavePath.Size = new System.Drawing.Size(135, 24);
+            this.btnSavePath.TabIndex = 0;
             this.btnSavePath.Text = "저장경로 변경...";
             this.btnSavePath.UseVisualStyleBackColor = true;
             this.btnSavePath.Click += new System.EventHandler(this.btnSavePath_Click);
@@ -279,19 +279,19 @@
             this.textSavePath.Location = new System.Drawing.Point(12, 89);
             this.textSavePath.Name = "textSavePath";
             this.textSavePath.ReadOnly = true;
-            this.textSavePath.Size = new System.Drawing.Size(581, 23);
+            this.textSavePath.Size = new System.Drawing.Size(566, 23);
             this.textSavePath.TabIndex = 12;
             this.textSavePath.TabStop = false;
             // 
             // btn_config
             // 
             this.btn_config.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_config.Font = new System.Drawing.Font("맑은 고딕", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
-            this.btn_config.Location = new System.Drawing.Point(599, 377);
+            this.btn_config.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.btn_config.Location = new System.Drawing.Point(584, 364);
             this.btn_config.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.btn_config.Name = "btn_config";
-            this.btn_config.Size = new System.Drawing.Size(120, 24);
-            this.btn_config.TabIndex = 6;
+            this.btn_config.Size = new System.Drawing.Size(135, 37);
+            this.btn_config.TabIndex = 4;
             this.btn_config.Text = "설정...";
             this.btn_config.UseVisualStyleBackColor = true;
             this.btn_config.Click += new System.EventHandler(this.btn_config_Click);
@@ -300,23 +300,23 @@
             // 
             this.combo_target_format.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.combo_target_format.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.combo_target_format.Font = new System.Drawing.Font("맑은 고딕", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.combo_target_format.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
             this.combo_target_format.FormattingEnabled = true;
-            this.combo_target_format.Location = new System.Drawing.Point(601, 148);
+            this.combo_target_format.Location = new System.Drawing.Point(584, 148);
             this.combo_target_format.Name = "combo_target_format";
-            this.combo_target_format.Size = new System.Drawing.Size(118, 25);
-            this.combo_target_format.TabIndex = 13;
+            this.combo_target_format.Size = new System.Drawing.Size(135, 29);
+            this.combo_target_format.TabIndex = 1;
             this.combo_target_format.SelectionChangeCommitted += new System.EventHandler(this.combo_target_format_SelectionChangeCommitted);
             // 
             // label_format
             // 
             this.label_format.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_format.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.label_format.BackColor = System.Drawing.SystemColors.Window;
             this.label_format.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label_format.Font = new System.Drawing.Font("맑은 고딕", 12F);
-            this.label_format.Location = new System.Drawing.Point(601, 121);
+            this.label_format.Font = new System.Drawing.Font("맑은 고딕", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label_format.Location = new System.Drawing.Point(584, 121);
             this.label_format.Name = "label_format";
-            this.label_format.Size = new System.Drawing.Size(118, 27);
+            this.label_format.Size = new System.Drawing.Size(135, 27);
             this.label_format.TabIndex = 14;
             this.label_format.Text = "변환할 형식";
             this.label_format.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -344,7 +344,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MinimumSize = new System.Drawing.Size(580, 420);
             this.Name = "FormMain";
-            this.Text = "hwp2pdf v2.0";
+            this.Text = "hwp2pdf v2.1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormMain_KeyUp);
             this.contextMenu_list.ResumeLayout(false);
