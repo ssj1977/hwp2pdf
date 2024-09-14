@@ -21,7 +21,7 @@ namespace hwp2pdf
         static bool st_bConverting = false;
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
         int option_source_ext_flag = (1 | 2 | 4); //Source 확장자에 대한 비트플래그 타입
-        bool option_PDF_print = true;
+        bool option_PDF_print = false; //true 면 가상인쇄 방식 사용
         HwpObject hwp_object = null; //한컴 오토메이션을 위한 기본 인터페이스
         bool filecheckdll_ok = false;
         //쓰레드에서 사용할 변수들
