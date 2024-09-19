@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using HwpObjectLib;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace hwp2pdf
 {
@@ -383,12 +384,32 @@ namespace hwp2pdf
                             hwp_print.Flags = 8192;
                             hwp_print.Device = 3;
                             //hwp_print.PrintPronounce = 0;
-                            bSuccess = hwp_action.Execute("PrintToPDF", hwp_set);
-                            //if (hwp_action.Execute("PrintToPDF", hwp_set) == true)
-                            //{
-                            //    bSuccess = true;
-                            //    Thread.Sleep(1000); //기다리지 않으면 가끔 '다른이름으로 저장' 창이 뜸
-                            //}
+                            bSuccess = hwp_action.Execute("Print", hwp_set); //PrintToPDF를 쓰면 폰트에 따라 숫자, 첨자 등이 안나올수 있음
+                            if (bSuccess == true)
+                            {
+                                show_convert_state(nRow, "파일 쓰는 중");
+                                //한컴 PDF Printer는 인쇄가 성공했더라도 실제 파일이 저장되었는지 확인도 필요함. 
+                                //별도 쓰레드가 돌아가면서 성공값이 리턴된 후에도 파일IO가 계속되는 경우가 있음
+                                //이렇게 하지 않으면 중간에 확인창이 뜬다.
+                                FileStream stream = null;
+                                bool bWriteFinished = false;
+                                while (bWriteFinished == false)
+                                {
+                                    try
+                                    {
+                                        stream = new FileStream(save_path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                                        if (stream != null) bWriteFinished = true;
+                                    }
+                                    catch (IOException)
+                                    {
+                                        bWriteFinished = false; //쓰기가 끝나지 않은 상태면
+                                        Thread.Sleep(500); //0.5초 대기
+                                        //Console.WriteLine($"Waiting...{save_path}"); //디버그용 코드
+                                    }
+                                }
+                                if (stream != null) stream.Close();
+                                show_convert_state(nRow, "쓰기 종료");
+                            }
                         }
                         else
                         {
