@@ -145,6 +145,8 @@
       <DependentUpon>FormSetSavePath.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="CommandLineRunner.cs" />
+    <Compile Include="ConversionEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FormConfig.resx">
       <DependentUpon>FormConfig.cs</DependentUpon>
