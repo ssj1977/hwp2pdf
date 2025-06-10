@@ -7,7 +7,7 @@ using System.Threading;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
-using HwpObjectLib;
+// using HwpObjectLib; // Removed as FormMain no longer directly uses HwpObjectLib types
 using System.Reflection;
 using System.Diagnostics;
 
@@ -23,8 +23,8 @@ namespace hwp2pdf
         int option_overwrite = 0; // 0:새이름으로 저장, 1:변환스킵, 2:덮어쓰기
         int option_source_ext_flag = (1 | 2 | 4); //Source 확장자에 대한 비트플래그 타입
         bool option_PDF_print = false; //true 면 가상인쇄 방식 사용
-        HwpObject hwp_object = null; //한컴 오토메이션을 위한 기본 인터페이스
-        bool filecheckdll_ok = false;
+        // HwpObject hwp_object = null; // Removed
+        // bool filecheckdll_ok = false; // Removed
         //쓰레드에서 사용할 변수들
         static int st_convert_target_index = 0;
         //static string[] target_type_array = new string[] { "PDF", "HWP", "HWPX", "HWPML2X", "HTML+", "ODT", "OOXML", "MSWORD", "UNICODE", "RTF" };
@@ -35,48 +35,51 @@ namespace hwp2pdf
         public static string[] source_ext_array = new string[] { ".hwp", ".hwpx", ".hml", ".html", ".odt", ".docx", ".doc", ".txt", ".rtf" };
         public FormMain()
         {
-            //한컴오피스 설치여부 확인
-            RegistryKey reg = Registry.CurrentUser.OpenSubKey("SOFTWARE", true).OpenSubKey("HNC", true);
-            if (reg == null)
-            {
-                MessageBox.Show("한컴오피스 한글2010 이상 버전이 설치되어 있지 않습니다.", "hwp2pdf");
-                this.Load += (s, e) => Close(); return;
-            }
+            // ConversionEngine HWP availability check
             try
             {
-                hwp_object = new HwpObject(); //한컴 오토메이션을 위한 기본 인터페이스
-                if (hwp_object == null)
+                using (var tempEngine = new ConversionEngine(message => {})) // Dummy logger for check
                 {
-                    MessageBox.Show("한컴오피스 초기화에 실패했습니다. \r\n(알수 없는 이유)", "hwp2pdf");
-                    this.Load += (s, e) => Close(); return; // 생성자 내에서 바로 닫으려면 이벤트를 추가해서 처리
-                                                            //Environment.Exit(0); //생성자 내에서 바로 닫는 두번째 방법
+                    // HWP automation seems available if no exception.
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"한컴오피스 초기화에 실패했습니다. \r\n {ex.Message}", "hwp2pdf");
-                this.Load += (s, e) => Close(); return;
+                MessageBox.Show($"한컴오토메이션 초기화 중 오류 발생 (ConversionEngine 생성 실패):\n{ex.Message}\n프로그램을 종료합니다.", "hwp2pdf Critical Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Load += (s, e) => Close(); // Use lambda for cleaner event handler attachment
+                return;
             }
+
             InitializeComponent();
+
+#if HWP2PDF_WINDOWS
             //ini 파일에서 정보 불러오기
             String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
             StringBuilder strTemp = new StringBuilder(1024, 1024);
             GetPrivateProfileString("Main", "SavePath", "", strTemp, strTemp.Capacity, ini_path);
             m_strSavePath = strTemp.ToString();
-            GetPrivateProfileString("Main", "SaveToCurrentPath", "", strTemp, strTemp.Capacity, ini_path);
-            if (strTemp.Length > 0) m_bUseCurrentPath = bool.Parse(strTemp.ToString());
-            GetPrivateProfileString("Main", "OptionOverwrite", "", strTemp, strTemp.Capacity, ini_path);
-            if (strTemp.Length > 0) option_overwrite = int.Parse(strTemp.ToString());
-            GetPrivateProfileString("Main", "OptionExtFlags", "", strTemp, strTemp.Capacity, ini_path);  // 과거 버전은 OptionExtFlag 
-            if (strTemp.Length > 0) option_source_ext_flag = int.Parse(strTemp.ToString());
-            GetPrivateProfileString("Main", "OptionPDFPrint", "", strTemp, strTemp.Capacity, ini_path);
-            if (strTemp.Length > 0) option_PDF_print = bool.Parse(strTemp.ToString());
-            GetPrivateProfileString("Main", "CurrentTargetType", "", strTemp, strTemp.Capacity, ini_path);
-            if (strTemp.Length > 0) st_convert_target_index = int.Parse(strTemp.ToString());
+            strTemp.Clear();
+            GetPrivateProfileString("Main", "SaveToCurrentPath", "true", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) bool.TryParse(strTemp.ToString(), out m_bUseCurrentPath); else m_bUseCurrentPath = true;
+            strTemp.Clear();
+            GetPrivateProfileString("Main", "OptionOverwrite", "0", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) int.TryParse(strTemp.ToString(), out option_overwrite); else option_overwrite = 0;
+            strTemp.Clear();
+            GetPrivateProfileString("Main", "OptionExtFlags", (1 | 2 | 4).ToString(), strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) int.TryParse(strTemp.ToString(), out option_source_ext_flag); else option_source_ext_flag = (1 | 2 | 4);
+            strTemp.Clear();
+            GetPrivateProfileString("Main", "OptionPDFPrint", "false", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) bool.TryParse(strTemp.ToString(), out option_PDF_print); else option_PDF_print = false;
+            strTemp.Clear();
+            GetPrivateProfileString("Main", "CurrentTargetType", "0", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) int.TryParse(strTemp.ToString(), out st_convert_target_index); else st_convert_target_index = 0;
+            strTemp.Clear();
             GetPrivateProfileString("Main", "PrinterName", "", strTemp, strTemp.Capacity, ini_path);
             m_strPrinter = strTemp.ToString();
-            GetPrivateProfileString("Main", "PrintMethod", "", strTemp, strTemp.Capacity, ini_path);
-            if (strTemp.Length > 0) m_nPrintMethod = int.Parse(strTemp.ToString());
+            strTemp.Clear();
+            GetPrivateProfileString("Main", "PrintMethod", "1", strTemp, strTemp.Capacity, ini_path);
+            if (strTemp.Length > 0) int.TryParse(strTemp.ToString(), out m_nPrintMethod); else m_nPrintMethod = 1;
+            strTemp.Clear();
             GetPrivateProfileString("Main", "Bounds", "", strTemp, strTemp.Capacity, ini_path);
             if (strTemp.Length > 0)
             {
@@ -100,67 +103,17 @@ namespace hwp2pdf
                     this.SetDesktopBounds(x, y, w, h);
                 }
             }
-            // FilePathCheckerModuleExample.DLL이 있어야 한컴오토메이션이 파일에 바로 접근 가능
-            // 초기화를 위해서는 레지스트리 "\HKEY_CURRENT_USER\SOFTWARE\HNC\HwpAutomation\Modules"에 
-            // FilePathCheckerModuleExample 값으로 DLL의 위치가 등록되어 있어야 함
-            //레지스트리에 보안모듈 추가
-            reg = reg.CreateSubKey("HwpAutomation");
-            if (reg == null)
-            {
-                MessageBox.Show("레지스트리 항목(HwpAutomation) 추가 중 오류가 발생했습니다.", "hwp2pdf");
-                this.Load += (s, e) => Close(); return;
-            }
-            reg = reg.CreateSubKey("Modules");
-            if (reg == null)
-            {
-                MessageBox.Show("레지스트리 항목(Modules) 추가 중 오류가 발생했습니다.", "hwp2pdf");
-                this.Load += (s, e) => Close(); return;
-            }
-            Object temp = reg.GetValue("FilePathCheckerModuleExample");
-            bool bRegisterCurrentPath = false;
-            // 먼저 레지스트리 값이 있는지 확인하고
-            if (temp == null)
-            {
-                add_log("레지스트리에 FilePathCheckerModuleExample.DLL이 등록되어 있지 않습니다.");
-                //레지스트리 값이 없다면 현재 실행경로에 DLL이 있는지 찾아서 등록 시도
-                bRegisterCurrentPath = true;
-            }
-            else
-            {
-                //레지스트리 값이 있는 경우 지정된 위치에 DLL이 존재하는지 확인
-                String dll_path = temp.ToString();
-                FileInfo file_info = new FileInfo(dll_path);
-                //파일이 없다면 실행파일과 같은 경로에 DLL이 있는지 재확인
-                if (file_info.Exists == false)
-                {
-                    add_log("레지스트리에 지정된 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
-                    bRegisterCurrentPath = true;
-                }
-            }
-            if (bRegisterCurrentPath)
-            {
-                // 레지스트리 값이 없거나 지정된 위치에 DLL 파일이 없는 경우, 현재 실행파일과 같은 경로에 DLL이 있는지 확인
-                String dll_path = System.Windows.Forms.Application.StartupPath;
-                dll_path += "\\" + "FilePathCheckerModuleExample.DLL";
-                FileInfo file_info = new FileInfo(dll_path);
-                // 있다면 레지스트리에 값을 추가
-                if (file_info.Exists)
-                {
-                    add_log("실행파일과 같은 경로의 FilePathCheckerModuleExample.DLL을 등록합니다.");
-                    reg.SetValue("FilePathCheckerModuleExample", dll_path);
-                }
-                else
-                {
-                    add_log("실행파일과 같은 경로에 FilePathCheckerModuleExample.DLL이 없습니다.");
-                }
-            }
-            filecheckdll_ok = hwp_object.RegisterModule("FilePathCheckDLL", "FilePathCheckerModuleExample");
-            if (filecheckdll_ok == false)
-            {
-                add_log("FilePathCheckerModuleExample.DLL 연결에 실패했습니다.");
-            }
-            // PDF 변환용 프린터가 설치되어 있는지 확인
-            System.Collections.ArrayList printer_names 
+#else
+            // On non-Windows, log skipping INI and rely on class member initializers for defaults.
+            // add_log might not be safe before full UI initialization, consider Console.WriteLine if needed for debugging.
+            // Console.WriteLine("[FormMain Constructor] INI file loading is skipped (non-Windows or HWP2PDF_WINDOWS not defined).");
+#endif
+            // FilePathCheckerModuleExample.DLL related logic is now handled within ConversionEngine's constructor.
+            // HWP object visibility and initial SetMessageBoxMode are also handled by ConversionEngine.
+            // The original logic for finding DLL path and registering it is simplified in ConversionEngine for now.
+
+            // PDF 변환용 프린터가 설치되어 있는지 확인 (This logic runs on all platforms)
+            System.Collections.ArrayList printer_names
                 = new System.Collections.ArrayList(System.Drawing.Printing.PrinterSettings.InstalledPrinters);
             bool bPrinterInstalled = false;
             bool bSetDefault = false;
@@ -281,161 +234,60 @@ namespace hwp2pdf
             th.Start();
             st_convert_target_index = combo_target_format.SelectedIndex;
         }
-        private void convert_thread(string[] paths, bool bUseCurrentPath, string strSavePath)
+        private void convert_thread(string[] paths, bool bUseCurrentPathLocal, string strSavePathLocal)
         {
-            if (filecheckdll_ok == false)
-            {
-                IXHwpWindows hwp_windows = (IXHwpWindows)hwp_object.XHwpWindows;
-                IXHwpWindow hwp_window = (IXHwpWindow)hwp_windows.Item[0];
-                hwp_window.Visible = filecheckdll_ok;
-            }
-            int nRow =0 ;
             int nConverted = 0;
-            add_log("파일 변환을 시작합니다. 잠시 기다려 주세요......");
-            string target_type = target_type_array[st_convert_target_index];
-            string target_ext = target_ext_array[st_convert_target_index];
-            foreach (string file_path in paths)
+            add_log("파일 변환을 시작합니다. (ConversionEngine 사용)");
+
+            string selectedTargetType = target_type_array[st_convert_target_index];
+            string selectedTargetExt = target_ext_array[st_convert_target_index];
+
+            try
             {
-                if (filecheckdll_ok == true) hwp_object.SetMessageBoxMode(0x00211411); //HwpCtrl API 문서에 있음
-                string file_ext = System.IO.Path.GetExtension(file_path).ToLower();
-                // 같은 종류인지 검사
-                if (file_ext == target_ext)
+                using (ConversionEngine engine = new ConversionEngine(this.add_log))
                 {
-                    show_convert_state(nRow, "변환안함(같은형식)");
-                }
-                else if (hwp_object.Open(file_path, "", "lock:false;forceopen:true;suspendpassword:true;")) //포맷을 지정하지 않아도 자동 인식
-                {
-                    show_convert_state(nRow, "변환중");
-                    string save_path = "";
-                    if (bUseCurrentPath == true)  save_path = System.IO.Path.GetDirectoryName(file_path);
-                    else                          save_path = strSavePath;
-                    save_path += "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + target_ext;
-                    //저장할 파일 이름과 겹치는 파일이 이미 있는지 확인하고 설정에 따라 처리
-                    bool bSkip = false;
-                    bool bChanged = false;
-                    bool bOverwirte = false;
-                    int temp_num = 0; 
-                    while (File.Exists(save_path))
+                    engine.TargetType = selectedTargetType;
+                    engine.TargetExtension = selectedTargetExt;
+                    engine.OverwriteOption = this.option_overwrite;
+                    engine.UsePdfPrint = this.option_PDF_print;
+                    engine.PrinterName = this.m_strPrinter;
+                    engine.PrintMethod = this.m_nPrintMethod;
+
+                    for (int nRow = 0; nRow < paths.Length; nRow++)
                     {
-                        temp_num += 1;
-                        if (option_overwrite == 0) // 이름 바꾸기
+                        if (!st_bConverting) { add_log("변환 작업을 중단합니다."); break; }
+
+                        string file_path = paths[nRow];
+                        string currentOutputDirectory = bUseCurrentPathLocal ? Path.GetDirectoryName(file_path) : strSavePathLocal;
+
+                        show_convert_state(nRow, "변환 준비중..."); // Initial status for UI
+
+                        bool success = engine.ConvertFile(file_path, currentOutputDirectory);
+                        // engine.LastStatusMessageForUI will be set by ConvertFile
+
+                        show_convert_state(nRow, engine.LastStatusMessageForUI); // Update UI with detailed status
+
+                        if (success) // Success here means file was processed without critical error, even if skipped
                         {
-                            if (bUseCurrentPath == true) save_path = System.IO.Path.GetDirectoryName(file_path);
-                            else save_path = strSavePath;
-                            save_path += "\\" + System.IO.Path.GetFileNameWithoutExtension(file_path) + "(" + temp_num.ToString() + ")" + target_ext;
-                            bChanged = true;
-                        }
-                        else if (option_overwrite == 1) //건너뛰기
-                        {
-                            bSkip = true;
-                            break;
-                        }
-                        else if (option_overwrite == 2)  //덮어쓰기
-                        {
-                            bOverwirte = true;
-                            bSkip = false;
-                            break;
-                        }
-                        else //예상치 못한 값의 경우 건너뛰기로 처리
-                        {
-                            bSkip = true;
-                            break;
-                        }
-                    }
-                    if (bSkip == true)
-                    {
-                        show_convert_state(nRow, "변환안함(이름겹침)");
-                    }
-                    else
-                    {
-                        bool bSuccess = false;
-                        if (target_type == "PDF" && option_PDF_print == true && m_strPrinter != "")
-                        {
-                            //HWPCONTROLLib.DHwpAction act = (HWPCONTROLLib.DHwpAction)temp_hwp.CreateAction("Print");
-                            //HWPCONTROLLib.DHwpParameterSet pset = (HWPCONTROLLib.DHwpParameterSet)act.CreateSet();
-                            //PDF 파일의 경우 가상 프린터를 사용하는 방식으로 변환 가능
-                            //인쇄 모아쓰기 설정을 변경할 수 있지만 인쇄 팝업이 잠시 떴다 사라짐
-                            //가상 프린터를 쓰지 않는 경우는 기존의 SaveAS 방식으로 변환
-                            HAction hwp_action = (HAction)hwp_object.HAction;
-                            HParameterSet hwp_pset = (HParameterSet)hwp_object.HParameterSet;
-                            HPrint hwp_print = (HPrint)hwp_pset.HPrint;
-                            HSet hwp_set = (HSet)hwp_print.HSet;
-                            hwp_action.GetDefault("Print", hwp_set);
-                            hwp_print.PrintMethod = (ushort)m_nPrintMethod;
-                            hwp_print.Collate = 1;
-                            hwp_print.NumCopy = 1;
-                            //hwp_print.UserOrder = 0;
-                            hwp_print.PrintToFile = 1;
-                            //hwp_print.Range = 0;
-                            hwp_print.filename = save_path;
-                            hwp_print.PrinterName = m_strPrinter;
-                            //hwp_print.UsingPagenum = 1;
-                            //hwp_print.ReverseOrder = 0;
-                            //hwp_print.Pause = 0;
-                            //hwp_print.PrintImage = 1;
-                            //hwp_print.PrintDrawObj = 1;
-                            //hwp_print.PrintClickHere = 0;
-                            //hwp_print.PrintFormObj = 1;
-                            //hwp_print.PrintMarkPen = 0;  // 추후 옵션 여부 검토할 것
-                            //hwp_print.PrintMemo = 0;
-                            //hwp_print.PrintMemoContents = 0;
-                            //hwp_print.PrintRevision = 1;
-                            //hwp_print.PrintBarcode = 1;
-                            hwp_print.Flags = 8192;
-                            hwp_print.Device = 3;
-                            //hwp_print.PrintPronounce = 0;
-                            bSuccess = hwp_action.Execute("Print", hwp_set); //PrintToPDF를 쓰면 폰트에 따라 숫자, 첨자 등이 안나올수 있음
-                            if (bSuccess == true)
+                            // Check if it was a genuine conversion for counting purposes
+                            if (engine.LastStatusMessageForUI.Contains("완료")) // "완료", "완료(덮어씀)", "완료(이름바꿈)"
                             {
-                                show_convert_state(nRow, "파일 쓰는 중");
-                                //한컴 PDF Printer는 인쇄가 성공했더라도 실제 파일이 저장되었는지 확인도 필요함. 
-                                //별도 쓰레드가 돌아가면서 성공값이 리턴된 후에도 파일IO가 계속되는 경우가 있음
-                                //이렇게 하지 않으면 중간에 확인창이 뜬다.
-                                FileStream stream = null;
-                                bool bWriteFinished = false;
-                                while (bWriteFinished == false)
-                                {
-                                    try
-                                    {
-                                        stream = new FileStream(save_path, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-                                        if (stream != null) bWriteFinished = true;
-                                    }
-                                    catch (IOException)
-                                    {
-                                        bWriteFinished = false; //쓰기가 끝나지 않은 상태면
-                                        Thread.Sleep(500); //0.5초 대기
-                                        //Console.WriteLine($"Waiting...{save_path}"); //디버그용 코드
-                                    }
-                                }
-                                if (stream != null) stream.Close();
-                                show_convert_state(nRow, "쓰기 종료");
+                               nConverted++;
                             }
                         }
-                        else
-                        {
-                            //SaveAs의 경우 PDF 변환시 HWP파일의 모아찍기 설정은 그대로 유지됨
-                            bSuccess = hwp_object.SaveAs(save_path, target_type, "");
-                        }
-                        if (bSuccess)
-                        {
-                            if (bOverwirte == true) show_convert_state(nRow, "완료(덮어씀)");
-                            else if (bChanged == true) show_convert_state(nRow, "완료(이름바꿈) - " + System.IO.Path.GetFileName(save_path));
-                            else show_convert_state(nRow, "완료");
-                            nConverted++;
-                        }
-                        else show_convert_state(nRow, "변환 시도 실패");
+                        // Error logging is now primarily handled by ConversionEngine via add_log
+
+                        if (!st_bConverting) { add_log("변환 작업을 중단합니다."); break; }
                     }
-                    hwp_object.Clear(1);
-                }
-                else show_convert_state(nRow, "원본파일 열기 실패");
-                nRow++;
-                if (st_bConverting == false)
-                {
-                    add_log("변환 작업을 중단합니다.");
-                    break;
-                }
+                } // Engine disposed here
             }
-            add_log(String.Format("{0}개 파일 중 {1}개 파일을 변환하였습니다.", paths.Length, nConverted));
+            catch (Exception ex) // Catch errors from engine instantiation or unexpected issues
+            {
+                add_log($"[FormMain.convert_thread] 중대한 오류 발생: {ex.Message}");
+                add_log($"스택 트레이스: {ex.StackTrace}");
+            }
+
+            add_log(String.Format("{0}개 파일 중 {1}개 파일을 변환 완료 또는 성공적으로 처리했습니다.", paths.Length, nConverted));
             st_bConverting = false;
             enable_controls(true);
         }
@@ -565,29 +417,31 @@ namespace hwp2pdf
         }
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (hwp_object != null) hwp_object.Quit();
-            String ini_path = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini";
-            WritePrivateProfileString("Main", "SaveToCurrentPath", m_bUseCurrentPath.ToString(), ini_path);
-            if (m_bUseCurrentPath == true) m_strSavePath = "";
-            WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path);
-            WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path);
-            WritePrivateProfileString("Main", "OptionExtFlags", option_source_ext_flag.ToString(), ini_path); // 과거 버전은 OptionExtFlag 
-            WritePrivateProfileString("Main", "OptionPDFPrint", option_PDF_print.ToString(), ini_path);
-            WritePrivateProfileString("Main", "CurrentTargetType", st_convert_target_index.ToString(), ini_path);
-            WritePrivateProfileString("Main", "PrinterName", m_strPrinter, ini_path);
-            WritePrivateProfileString("Main", "PrintMethod", m_nPrintMethod.ToString(), ini_path);
-            String strTemp;
+            // if (hwp_object != null) hwp_object.Quit(); // Removed, ConversionEngine handles its own HwpObject
+#if HWP2PDF_WINDOWS
+            String ini_path_closing = System.Windows.Forms.Application.StartupPath + "\\hwp2pdf.ini"; // Use different var name
+            WritePrivateProfileString("Main", "SaveToCurrentPath", m_bUseCurrentPath.ToString(), ini_path_closing);
+            if (m_bUseCurrentPath == true) m_strSavePath = ""; // Don't save path if using current path
+            WritePrivateProfileString("Main", "SavePath", m_strSavePath, ini_path_closing);
+            WritePrivateProfileString("Main", "OptionOverwrite", option_overwrite.ToString(), ini_path_closing);
+            WritePrivateProfileString("Main", "OptionExtFlags", option_source_ext_flag.ToString(), ini_path_closing);
+            WritePrivateProfileString("Main", "OptionPDFPrint", option_PDF_print.ToString(), ini_path_closing);
+            WritePrivateProfileString("Main", "CurrentTargetType", st_convert_target_index.ToString(), ini_path_closing);
+            WritePrivateProfileString("Main", "PrinterName", m_strPrinter, ini_path_closing);
+            WritePrivateProfileString("Main", "PrintMethod", m_nPrintMethod.ToString(), ini_path_closing);
+            String strBoundsValue_closing; // Use different var name
             if (WindowState == FormWindowState.Maximized || WindowState==FormWindowState.Minimized)
             {
-                strTemp = RestoreBounds.Location.X.ToString() + ',' + RestoreBounds.Location.Y.ToString()
+                strBoundsValue_closing = RestoreBounds.Location.X.ToString() + ',' + RestoreBounds.Location.Y.ToString()
                     + ',' + RestoreBounds.Size.Width.ToString() + ',' + RestoreBounds.Size.Height.ToString();
             }
             else
             {
-                strTemp = this.Location.X.ToString() + ',' + this.Location.Y.ToString()
+                strBoundsValue_closing = this.Location.X.ToString() + ',' + this.Location.Y.ToString()
                     + ',' + this.Size.Width.ToString() + ',' + this.Size.Height.ToString();
             }
-            WritePrivateProfileString("Main", "Bounds", strTemp, ini_path);
+            WritePrivateProfileString("Main", "Bounds", strBoundsValue_closing, ini_path_closing);
+#endif
         }
         private void btnSavePath_Click(object sender, EventArgs e)
         {
@@ -642,10 +496,12 @@ namespace hwp2pdf
             contextMenu_list.Items[5].Enabled = (list_file.Items.Count > 0);
         }
 
-        [DllImport("kernel32")]
+#if HWP2PDF_WINDOWS
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] // Added SetLastError
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
-        [DllImport("kernel32")]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] // Added SetLastError
         private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+#endif
 
         private void btn_config_Click(object sender, EventArgs e)
         {
