@@ -229,7 +229,7 @@ namespace hwp2pdf
                 try
                 {
                     // 배타적으로 열리면 가상 프린터의 파일 쓰기가 끝난 상태
-                    using (var stream = new FileStream(savePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    using (var stream = new FileStream(savePath, FileMode.Open, FileAccess.Read, FileShare.None))
                     { }
                     return true;
                 }
@@ -278,20 +278,15 @@ namespace hwp2pdf
                     overwrite = true;
                     break;
                 }
-                else
-                {
-                    shouldSkip = true;
-                    break;
-                }
             }
         }
 
         private static bool RegistryHasHancom()
         {
-            using (RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE"))
+            using (RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE", false))
             {
                 if (software == null) return false;
-                using (RegistryKey hnc = software.OpenSubKey("HNC"))
+                using (RegistryKey hnc = software.OpenSubKey("HNC", false))
                 {
                     return hnc != null;
                 }
