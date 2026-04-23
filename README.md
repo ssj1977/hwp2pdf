@@ -29,15 +29,29 @@ https://github.com/ssj1977/hwp2pdf/releases/download/Alpha/hwp2pdf.zip
 
 - FilePathCheckerModuleExample.dll
 
-## 사용 방법
+## 사용 방법 (Windows Terminal CLI)
 
-- 설치한 폴더 내에 있는 hwp2pdf.exe 를 클릭하여 실행합니다.
-- 실행 후 HWP 파일을 드래그 앤 드롭으로 끌어다 놓으면 목록에 추가됩니다.
-- '변환' 버튼을 클릭하면 목록의 HWP 파일이 PDF로 변환되어 저장됩니다.
-- 저장되는 이름은 HWP파일과 같은 이름에 확장자만 바뀌며, 같은 폴더에 저장됩니다.
-- 동일한 이름의 PDF 파일이 이미 있는 경우 자동으로 덮어쓰게 되는 것에 주의해 주세요.
-- '초기화' 버튼을 클릭하면 목록을 지우고 다시 추가할 수 있습니다.
-- '닫기' 버튼을 클릭하면 프로그램이 종료됩니다.
+```bash
+hwp2pdf.exe C:\docs\a.hwp C:\docs\b.hwpx
+```
+
+```bash
+hwp2pdf.exe C:\docs --output C:\out --target PDF --overwrite rename
+```
+
+주요 옵션:
+
+- `--input`, `-i`: 입력 파일/폴더를 반복 지정
+- `--output`, `-o`: 출력 폴더 지정 (기본값: 원본 파일 폴더)
+- `--target`, `-t`: 출력 형식 지정 (`PDF`, `HWP`, `HWPX`, `HWPML2X`, `HTML+`, `ODT`, `OOXML`, `UNICODE`, `RTF`)
+- `--overwrite`: 이름 충돌 처리 (`rename`, `skip`, `overwrite`)
+- `--pdf-print`: PDF 변환 시 가상 프린터 방식 사용
+- `--printer`: PDF 프린터 이름 지정
+- `--print-method`: HWP 인쇄 방식 번호 지정
+- `--help`: 도움말 출력
+- `--gui`: 기존 GUI 모드 실행
+
+기존 GUI 방식도 유지됩니다.
 
 ## 기타
 
