@@ -222,11 +222,13 @@ namespace hwp2pdf
 
         private static bool WaitForFileWriteCompletion(string savePath)
         {
-            const int maxRetryCount = 120;
+            const int maxWaitSeconds = 60;
+            const int maxRetryCount = maxWaitSeconds * 2; // 500ms 간격
             for (int retry = 0; retry < maxRetryCount; retry++)
             {
                 try
                 {
+                    // 배타적으로 열리면 가상 프린터의 파일 쓰기가 끝난 상태
                     using (var stream = new FileStream(savePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                     { }
                     return true;
@@ -286,10 +288,10 @@ namespace hwp2pdf
 
         private static bool RegistryHasHancom()
         {
-            using (RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE", true))
+            using (RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE"))
             {
                 if (software == null) return false;
-                using (RegistryKey hnc = software.OpenSubKey("HNC", true))
+                using (RegistryKey hnc = software.OpenSubKey("HNC"))
                 {
                     return hnc != null;
                 }
