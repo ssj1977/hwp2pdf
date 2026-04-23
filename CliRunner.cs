@@ -204,7 +204,7 @@ namespace hwp2pdf
                     success = hwpAction.Execute("Print", hwpSet);
                     if (success)
                     {
-                        WaitForFileWriteCompletion(savePath);
+                        success = WaitForFileWriteCompletion(savePath);
                     }
                 }
                 else
@@ -220,29 +220,28 @@ namespace hwp2pdf
             }
         }
 
-        private static void WaitForFileWriteCompletion(string savePath)
+        private static bool WaitForFileWriteCompletion(string savePath)
         {
-            FileStream stream = null;
-            try
+            const int maxRetryCount = 120;
+            for (int retry = 0; retry < maxRetryCount; retry++)
             {
-                bool writeFinished = false;
-                while (!writeFinished)
+                try
                 {
-                    try
+                    using (var stream = new FileStream(savePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                    { }
+                    return true;
+                }
+                catch (IOException)
+                {
+                    if (retry > 0 && retry % 10 == 0)
                     {
-                        stream = new FileStream(savePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-                        writeFinished = true;
+                        Console.WriteLine("파일 쓰기 완료 대기 중: " + Path.GetFileName(savePath));
                     }
-                    catch (IOException)
-                    {
-                        Thread.Sleep(500);
-                    }
+                    Thread.Sleep(500);
                 }
             }
-            finally
-            {
-                if (stream != null) stream.Close();
-            }
+            Console.Error.WriteLine("파일 쓰기 완료 대기 시간이 초과되었습니다: " + savePath);
+            return false;
         }
 
         private static string BuildTargetPath(string sourcePath, string outputDirectory, bool useCurrentPath, string targetExt)
@@ -287,48 +286,60 @@ namespace hwp2pdf
 
         private static bool RegistryHasHancom()
         {
-            RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE", true);
-            if (software == null) return false;
-            RegistryKey hnc = software.OpenSubKey("HNC", true);
-            return hnc != null;
+            using (RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE", true))
+            {
+                if (software == null) return false;
+                using (RegistryKey hnc = software.OpenSubKey("HNC", true))
+                {
+                    return hnc != null;
+                }
+            }
         }
 
         private static bool RegisterSecurityModule(HwpObject hwpObject)
         {
-            RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE", true);
-            if (software == null) return false;
-
-            RegistryKey hnc = software.OpenSubKey("HNC", true);
-            if (hnc == null) return false;
-
-            RegistryKey automation = hnc.CreateSubKey("HwpAutomation");
-            if (automation == null) return false;
-
-            RegistryKey modules = automation.CreateSubKey("Modules");
-            if (modules == null) return false;
-
-            const string valueName = "FilePathCheckerModuleExample";
-            object current = modules.GetValue(valueName);
-            bool registerCurrentPath = false;
-            if (current == null)
+            using (RegistryKey software = Registry.CurrentUser.OpenSubKey("SOFTWARE", true))
             {
-                registerCurrentPath = true;
-            }
-            else
-            {
-                string dllPath = current.ToString();
-                if (!File.Exists(dllPath))
+                if (software == null) return false;
+
+                using (RegistryKey hnc = software.OpenSubKey("HNC", true))
                 {
-                    registerCurrentPath = true;
-                }
-            }
+                    if (hnc == null) return false;
 
-            if (registerCurrentPath)
-            {
-                string dllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FilePathCheckerModuleExample.DLL");
-                if (File.Exists(dllPath))
-                {
-                    modules.SetValue(valueName, dllPath);
+                    using (RegistryKey automation = hnc.CreateSubKey("HwpAutomation"))
+                    {
+                        if (automation == null) return false;
+
+                        using (RegistryKey modules = automation.CreateSubKey("Modules"))
+                        {
+                            if (modules == null) return false;
+
+                            const string valueName = "FilePathCheckerModuleExample";
+                            object current = modules.GetValue(valueName);
+                            bool registerCurrentPath = false;
+                            if (current == null)
+                            {
+                                registerCurrentPath = true;
+                            }
+                            else
+                            {
+                                string dllPath = current.ToString();
+                                if (!File.Exists(dllPath))
+                                {
+                                    registerCurrentPath = true;
+                                }
+                            }
+
+                            if (registerCurrentPath)
+                            {
+                                string dllPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FilePathCheckerModuleExample.DLL");
+                                if (File.Exists(dllPath))
+                                {
+                                    modules.SetValue(valueName, dllPath);
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
