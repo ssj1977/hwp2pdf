@@ -39,17 +39,94 @@ hwp2pdf.exe C:\docs\a.hwp C:\docs\b.hwpx
 hwp2pdf.exe C:\docs --output C:\out --target PDF --overwrite rename
 ```
 
-주요 옵션:
+주요 옵션(기본값 포함):
 
-- `--input`, `-i`: 입력 파일/폴더를 반복 지정
+- `--input`, `-i`: 입력 파일/폴더를 반복 지정 (기본값: 없음, 위치 인자로도 입력 가능. 최소 1개 입력 필요)
 - `--output`, `-o`: 출력 폴더 지정 (기본값: 원본 파일 폴더)
-- `--target`, `-t`: 출력 형식 지정 (`PDF`, `HWP`, `HWPX`, `HWPML2X`, `HTML+`, `ODT`, `OOXML`, `UNICODE`, `RTF`)
-- `--overwrite`: 이름 충돌 처리 (`rename`, `skip`, `overwrite`)
-- `--pdf-print`: PDF 변환 시 가상 프린터 방식 사용
-- `--printer`: PDF 프린터 이름 지정
-- `--print-method`: HWP 인쇄 방식 번호 지정
-- `--help`: 도움말 출력
-- `--gui`: 기존 GUI 모드 실행
+- `--target`, `-t`: 출력 형식 지정 (`PDF`, `HWP`, `HWPX`, `HWPML2X`, `HTML+`, `ODT`, `OOXML`, `UNICODE`, `RTF`) (기본값: `PDF`)
+- `--overwrite`: 이름 충돌 처리 (`rename`, `skip`, `overwrite`) (기본값: `rename`)
+- `--pdf-print`: PDF 변환 시 가상 프린터 방식 사용 (기본값: 비활성화)
+- `--printer`: PDF 프린터 이름 지정 (기본값: 미지정, `--pdf-print` 사용 시 한컴 PDF 우선/없으면 Microsoft PDF 자동 선택)
+- `--print-method`: HWP 인쇄 방식 번호 지정 (기본값: `1`)
+- `--help`: 도움말 출력 (기본값: 미사용)
+- `--gui`: 기존 GUI 모드 실행 (기본값: 미사용)
+
+실행 기본 동작:
+
+- 인자 없이 실행하면 GUI로 실행됩니다.
+- 인자가 있으면 CLI로 실행됩니다.
+
+CLI 예시:
+
+```bash
+# 1) 단일 파일 변환 (원본 폴더에 PDF 저장)
+hwp2pdf.exe C:\work\sample.hwp
+```
+
+```bash
+# 2) 여러 파일 한 번에 변환
+hwp2pdf.exe C:\work\a.hwp C:\work\b.hwpx C:\work\c.docx
+```
+
+```bash
+# 3) 폴더 입력(하위 폴더 포함 재귀 탐색)
+hwp2pdf.exe C:\work\docs
+```
+
+```bash
+# 4) --input 옵션을 반복해서 입력
+hwp2pdf.exe --input C:\work\a.hwp --input C:\work\docs --input C:\work\b.rtf
+```
+
+```bash
+# 5) 출력 폴더 지정
+hwp2pdf.exe C:\work\docs --output C:\work\out
+```
+
+```bash
+# 6) PDF가 아닌 다른 형식으로 변환 (예: HWPX)
+hwp2pdf.exe C:\work\docs --target HWPX
+```
+
+```bash
+# 7) 이름 충돌 시 건너뛰기
+hwp2pdf.exe C:\work\docs --overwrite skip
+```
+
+```bash
+# 8) 이름 충돌 시 덮어쓰기
+hwp2pdf.exe C:\work\docs --overwrite overwrite
+```
+
+```bash
+# 9) PDF 인쇄 방식 사용(프린터 자동 선택)
+hwp2pdf.exe C:\work\docs --target PDF --pdf-print
+```
+
+```bash
+# 10) PDF 인쇄 방식 + 프린터 직접 지정
+hwp2pdf.exe C:\work\docs --pdf-print --printer "Microsoft Print to PDF"
+```
+
+```bash
+# 11) PDF 인쇄 방식 + print method 지정
+hwp2pdf.exe C:\work\docs --pdf-print --print-method 1
+```
+
+```bash
+# 12) 공백이 있는 경로 처리
+hwp2pdf.exe "C:\my docs\input folder" --output "D:\pdf output"
+```
+
+```bash
+# 13) 도움말 출력
+hwp2pdf.exe --help
+```
+
+```bash
+# 14) 강제로 GUI 실행
+hwp2pdf.exe --gui
+```
 
 기존 GUI 방식도 유지됩니다.
 
