@@ -141,3 +141,49 @@ PS C:\Users\KU> try {
   - `docs/prompt_history.md`
 - 수정된 파일 목록
   - `README.md`
+
+## 2026-04-27 16:05:00 old GUI와 현재 CLI 차이 질의
+
+### User Request
+
+근데 예전 GUI 버전은 이런 설정 없이도 동작했는데, 무슨 차이야? C:\Users\KU\puhaha\hwp2pdf\hwp2pdf-old-gui 안의 빌드된 버전이 있어. dll 파일들 때문이야? 그럼 이런 dll을 활용해서 설정 없이도 동작하게 할 수 없어?
+
+### Analysis & Actions
+
+- `hwp2pdf-old-gui` 폴더 구성 파일(AxInterop/Interop DLL, exe) 확인
+- IL 덤프 분석으로 old GUI의 COM 경로 확인(`AxHwpCtrl`, `HWPCONTROLLib`)
+- 현재 코드의 COM 경로(`HwpObjectLib`, `HWPFrame.HwpObject`)와 비교
+- DLL 역할(래퍼 vs COM 서버 본체) 구분 및 무설정 가능 범위 판단
+
+### Outputs
+
+- 생성된 파일 목록
+  - 없음
+- 수정된 파일 목록
+  - 없음
+
+## 2026-04-27 16:10:00 발견 내용 상세 문서화 요청
+
+### User Request
+
+발견한 내용은 문서로 자세히 정리해줘
+
+### Analysis & Actions
+
+- README 최근 변경 내역 갱신
+- `docs/findings.md`에 old GUI vs 현재 CLI 차이, DLL 역할, 결론 상세 추가
+- `docs/implementation.md`에 DLL 재사용 가능/불가 범위와 운영 가이드 추가
+- `docs/architecture.md`, `docs/decision.md`, `docs/progress.md` 동기화
+
+### Outputs
+
+- 생성된 파일 목록
+  - 없음
+- 수정된 파일 목록
+  - `README.md`
+  - `docs/architecture.md`
+  - `docs/implementation.md`
+  - `docs/findings.md`
+  - `docs/decision.md`
+  - `docs/progress.md`
+  - `docs/prompt_history.md`

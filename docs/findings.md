@@ -46,3 +46,45 @@
   - `HWP` (입력과 동일 형식)
 - 실패:
   - `ODT`
+
+## 문제 4: old GUI는 설정 없이 동작했는데 현재는 COM 설정이 필요한 이유
+
+검증 대상:
+
+- old 바이너리 경로: `hwp2pdf-old-gui`
+- 포함 파일:
+  - `hwp2pdf.exe`
+  - `AxInterop.HWPCONTROLLib.dll`
+  - `Interop.HWPCONTROLLib.dll`
+  - `FilePathCheckerModuleExample.dll`
+
+분석 결과:
+
+- old GUI 실행 파일은 `AxInterop.HWPCONTROLLib` 기반 `AxHwpCtrl`을 사용한다.
+  - IL 덤프에서 `AxHwpCtrl::Open`, `AxHwpCtrl::SaveAs`, `AxHost/ClsidAttribute("bd9c32de-...")` 확인
+- 현재 코드(소스)는 `HwpObjectLib` + `HWPFrame.HwpObject`를 직접 생성한다.
+  - `CliRunner.cs`, `FormMain.cs`에서 `new HwpObject()` 사용
+- 즉, old GUI와 현재 코드는 한글 자동화 경로가 동일하지 않다.
+
+레지스트리 확인 포인트:
+
+- `HWPFrame.HwpObject` 관련 CLSID는 32비트 뷰(`WOW6432Node`)에 존재할 수 있다.
+- 실제 동작 판정은 레지스트리 단일 키보다 아래 테스트가 더 정확하다.
+
+```powershell
+try {
+    $hwp = New-Object -ComObject HWPFrame.HwpObject
+    "OK"
+    $hwp.Quit()
+} catch {
+    "FAIL: $($_.Exception.Message)"
+}
+```
+
+질문에 대한 결론:
+
+- `AxInterop/Interop.HWPCONTROLLib.dll`은 COM 서버 본체가 아니라 인터롭 래퍼 DLL이다.
+- 따라서 DLL만으로 현재 코드의 COM 의존(`HWPFrame.HwpObject`)을 완전히 제거할 수 없다.
+- 다만 아래는 가능:
+  - 빌드 시 COMReference 대신 파일 참조 기반으로 전환(개발 환경 의존성 감소)
+  - 런타임에 COM 헬스체크 및 자동복구 가이드 제공(운영 편의 개선)

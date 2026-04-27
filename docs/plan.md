@@ -11,3 +11,4 @@
 2. 기술 문서(`PRD`, `architecture`, `implementation`) 작성
 3. 장애 기록(`findings`, `decision`) 작성
 4. 진행상태/이력(`progress`, `prompt_history`) 기록
+5. old GUI vs 현재 CLI 차이 분석 결과를 문서에 상세 반영
