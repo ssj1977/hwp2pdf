@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F6D273D0-2083-48B3-8815-E3BFFFA9F260}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>hwp2pdf</RootNamespace>
     <AssemblyName>hwp2pdf</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -129,6 +129,7 @@
     <Compile Include="FormConfig.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="CliRunner.cs" />
     <Compile Include="FormConfig.Designer.cs">
       <DependentUpon>FormConfig.cs</DependentUpon>
     </Compile>
